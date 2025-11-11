@@ -142,9 +142,22 @@ const App: React.FC = () => {
                             path="/news"
                             element={<NewsArabic />}
                         />
-                        <Route path="/about" element={React.createElement(require('./components/About').default)} />
-                        {/* 404 fallback */}
-                        <Route path="*" element={React.createElement(require('./components/NotFound').default)} />
+        <Route path="/about" element={
+                            <div className="relative z-10 py-20 px-4 max-w-4xl mx-auto">
+                                <h1 className="text-4xl font-bold text-white mb-6">عن المنصة</h1>
+                                <div className="bg-slate-800 rounded-lg p-8 text-slate-300 space-y-4">
+                                    <p>AI Guide Pro هي منصة عربية متكاملة لتعليم الذكاء الاصطناعي.</p>
+                                    <p>نهدف إلى توفير محتوى عربي عالي الجودة في مجال الذكاء الاصطناعي.</p>
+                                </div>
+                            </div>
+                        } />
+        {/* 404 fallback */}
+        <Route path="*" element={
+                            <div className="relative z-10 py-20 px-4 text-center">
+                                <h1 className="text-6xl font-bold text-white mb-4">404</h1>
+                                <p className="text-xl text-slate-400">الصفحة غير موجودة</p>
+                            </div>
+                        } />
                     </Routes>
                     <Footer />
                 </main>
