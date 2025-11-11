@@ -10,7 +10,7 @@ const About: React.FC = () => (
       <li>واجهة عربية سهلة الاستخدام</li>
       <li>محتوى مجاني ومفتوح للجميع</li>
     </ul>
-    <p>للاستفسار أو المساهمة: <a href="mailto:info@aiguidepro.com" className="text-emerald-400 hover:underline">info@aiguidepro.com</a></p>
+  <p>للاستفسار أو المساهمة: <a href="mailto:soldiom@gmail.com" className="text-emerald-400 hover:underline">soldiom@gmail.com</a></p>
   </div>
 );
 

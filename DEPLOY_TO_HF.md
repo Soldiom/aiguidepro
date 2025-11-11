@@ -55,4 +55,4 @@ jobs:
 
 ---
 
-لأي استفسار: info@aiguidepro.com
+لأي استفسار: soldiom@gmail.com
