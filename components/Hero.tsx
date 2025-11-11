@@ -1,4 +1,5 @@
 import React from 'react';
+import { openExternal } from '../utils/openExternal';
 
 const Hero: React.FC = () => {
   return (
@@ -23,22 +24,20 @@ const Hero: React.FC = () => {
         </div>
 
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
-            <a 
-              href="https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <button
+              type="button"
+              onClick={() => openExternal('https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro')}
               className="w-full sm:w-auto bg-emerald-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-emerald-600 transition-colors duration-300 transform hover:scale-105"
             >
               استشر خبيرك AIGuidePro
-            </a>
-            <a 
-              href="https://manus.im/invitation/WPMFXDLTGFVO" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            </button>
+            <button
+              type="button"
+              onClick={() => openExternal('https://manus.im/invitation/WPMFXDLTGFVO')}
               className="w-full sm:w-auto bg-slate-700 text-white font-bold py-3 px-8 rounded-lg hover:bg-slate-600 transition-colors duration-300"
             >
               جرب منصة Manus
-            </a>
+            </button>
         </div>
 
       </div>

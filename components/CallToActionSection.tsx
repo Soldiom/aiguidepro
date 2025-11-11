@@ -1,4 +1,5 @@
 import React from 'react';
+import { openExternal } from '../utils/openExternal';
 
 const CallToActionSection: React.FC = () => {
   return (
@@ -11,22 +12,20 @@ const CallToActionSection: React.FC = () => {
             استخدم مساعدي الذكي <span className="font-bold text-white">AIGuidePro</span> كخبير شخصي لك. ولنتائج أفضل، تعاون بينه وبين منصة <span className="font-bold text-white">Manus</span> لتحقيق أقصى استفادة.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a 
-              href="https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <button
+              type="button"
+              onClick={() => openExternal('https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro')}
               className="w-full sm:w-auto bg-emerald-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-emerald-600 transition-colors duration-300 transform hover:scale-105"
             >
               ابدأ الآن مع AIGuidePro
-            </a>
-            <a 
-              href="https://manus.im/invitation/WPMFXDLTGFVO" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            </button>
+            <button
+              type="button"
+              onClick={() => openExternal('https://manus.im/invitation/WPMFXDLTGFVO')}
               className="w-full sm:w-auto bg-slate-700 text-white font-bold py-3 px-8 rounded-lg hover:bg-slate-600 transition-colors duration-300"
             >
               احصل على 500 رصيد مجاني في Manus
-            </a>
+            </button>
           </div>
         </div>
 

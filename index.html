@@ -1,10 +1,28 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src 'self' https://cdn.tailwindcss.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self';" />
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Guide Pro - دليلك العربي للذكاء الاصطناعي</title>
+
+  <title>AI Guide Pro - دليلك العربي للذكاء الاصطناعي</title>
+  <meta name="description" content="منصة عربية متكاملة لدورات وأخبار الذكاء الاصطناعي، أحدث الأبحاث، وأدوات الذكاء الاصطناعي باللغة العربية." />
+  <meta name="keywords" content="ذكاء اصطناعي, AI, تعليم, دورات, أخبار, أبحاث, عربية, Kuwait, AI Guide Pro" />
+  <meta name="author" content="مهندس علي يعقوب الذويخ" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ar_AR" />
+  <meta property="og:title" content="AI Guide Pro - دليلك العربي للذكاء الاصطناعي" />
+  <meta property="og:description" content="منصة عربية متكاملة لدورات وأخبار الذكاء الاصطناعي، أحدث الأبحاث، وأدوات الذكاء الاصطناعي باللغة العربية." />
+  <meta property="og:image" content="/og-image.png" />
+  <meta property="og:url" content="https://aiguidepro.com" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AI Guide Pro - دليلك العربي للذكاء الاصطناعي" />
+  <meta name="twitter:description" content="منصة عربية متكاملة لدورات وأخبار الذكاء الاصطناعي، أحدث الأبحاث، وأدوات الذكاء الاصطناعي باللغة العربية." />
+  <meta name="twitter:image" content="/og-image.png" />
+  <meta name="twitter:site" content="@aiguidepro" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,19 +33,9 @@
         font-family: 'Cairo', sans-serif;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "vite": "https://aistudiocdn.com/vite@^7.2.2",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.0",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^0.17.0"
-  }
-}
-</script>
-</head>
+    <!-- Plausible Analytics -->
+    <script async defer data-domain="aiguidepro.com" src="https://plausible.io/js/plausible.js"></script>
+  </head>
   <body class="bg-slate-900 text-slate-200">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>

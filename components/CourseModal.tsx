@@ -1,31 +1,15 @@
 import React, { useState } from 'react';
+import type { Course, Week } from '../types/course';
+import { openExternal } from '../utils/openExternal';
 
-interface Week {
-  title: string;
-  description: string;
-  topics: string[];
-}
-
-interface Course {
-  id: number;
-  headline: string;
-  title: string;
-  level: string;
-  description: string;
-  weeks: Week[];
-  details: {
-    type: 'list' | 'text';
-    title?: string;
-    items: string[];
-  }[];
-}
+// Types moved to types/course.ts
 
 interface CourseModalProps {
   course: Course;
   onClose: () => void;
 }
 
-const AccordionItem: React.FC<{ week: Week; isOpen: boolean; onClick: () => void }> = ({ week, isOpen, onClick }) => {
+const AccordionItem: React.FC<{ week: Week; isOpen: boolean; onClick: () => void; onSmartHelp?: () => void }> = ({ week, isOpen, onClick, onSmartHelp }) => {
   return (
     <div className="border-b border-slate-700">
       <button
@@ -52,6 +36,16 @@ const AccordionItem: React.FC<{ week: Week; isOpen: boolean; onClick: () => void
               <li key={index}>{topic}</li>
             ))}
           </ul>
+          {onSmartHelp && (
+            <div className="mt-4">
+              <button
+                onClick={onSmartHelp}
+                className="bg-emerald-500 text-white font-bold py-2 px-4 rounded hover:bg-emerald-600"
+              >
+                مساعدة ذكية لهذا الأسبوع
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -61,9 +55,120 @@ const AccordionItem: React.FC<{ week: Week; isOpen: boolean; onClick: () => void
 
 const CourseModal: React.FC<CourseModalProps> = ({ course, onClose }) => {
   const [openWeekIndex, setOpenWeekIndex] = useState<number | null>(0);
+  const [includeTopics, setIncludeTopics] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const stored = localStorage.getItem('aiguidepro.includeTopics');
+    return stored === 'false' ? false : true;
+  });
+  const [toast, setToast] = useState<string | null>(null);
 
   const handleWeekClick = (index: number) => {
     setOpenWeekIndex(openWeekIndex === index ? null : index);
+  };
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    window.setTimeout(() => setToast(null), 2500);
+  };
+
+  const composeWeekPrompt = (week: Week) => {
+    const header = `أنت مستشار الذكاء الاصطناعي AIGuidePro. ساعدني بوضوح وبالعربية فقط.`;
+    const context = `\n\nالدورة: ${course.title}\nالمستوى: ${course.level}\nالأسبوع: ${week.title}\nالوصف: ${week.description}`;
+    const topics = includeTopics && week.topics?.length ? `\nالموضوعات:\n- ${week.topics.join('\n- ')}` : '';
+    const ask = `\n\nالمطلوب: اشرح النقاط عملياً بخطوات قصيرة، أمثلة بسيطة، وتمارين صغيرة قابلة للتنفيذ. ثم أعطني اختباراً قصيراً (3 أسئلة) للإتقان.`;
+    return header + context + topics + ask;
+  };
+
+  const handleSmartHelp = async (week: Week) => {
+    const prompt = composeWeekPrompt(week);
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        await navigator.clipboard.writeText(prompt);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = prompt;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      showToast('تم نسخ سياق الأسبوع. افتح AIGuidePro والصقه في الرسالة الأولى.');
+    } catch {
+      showToast('تعذر النسخ تلقائياً. افتح AIGuidePro وانسخ الرسالة يدوياً.');
+    }
+    const url = course.consultantUrl || 'https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro';
+    openExternal(url);
+  };
+
+  const handleCopyOnlyWeek = async (week: Week) => {
+    const prompt = composeWeekPrompt(week);
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        await navigator.clipboard.writeText(prompt);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = prompt;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      showToast('تم النسخ — يمكنك لصق الرسالة في AIGuidePro.');
+    } catch {
+      showToast('تعذر النسخ تلقائياً — انسخ الرسالة يدوياً.');
+    }
+  };
+
+  const composeCoursePrompt = () => {
+    const header = `أنت مستشار الذكاء الاصطناعي AIGuidePro. ساعدني بوضوح وبالعربية فقط.`;
+    const context = `\n\nالدورة: ${course.title}\nالمستوى: ${course.level}\nالوصف العام: ${course.description}`;
+    const weeksList = course.weeks?.length
+      ? `\nخطة الأسابيع:\n${course.weeks
+          .map((w, i) => `الأسبوع ${i + 1}: ${w.title}${includeTopics && w.topics?.length ? `\n- ${w.topics.join('\n- ')}` : ''}`)
+          .join('\n')}`
+      : '';
+    const ask = `\n\nالمطلوب: ضع لي خطة تعلم عملية مختصرة لمحتوى الدورة، بخطوات تطبيقية، أمثلة قصيرة، وتمارين، ثم اختبار قصير نهائي. التزم باللغة العربية فقط.`;
+    return header + context + weeksList + ask;
+  };
+
+  const handleSmartHelpCourse = async () => {
+    const prompt = composeCoursePrompt();
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        await navigator.clipboard.writeText(prompt);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = prompt;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      showToast('تم نسخ سياق الدورة. افتح AIGuidePro والصقه في الرسالة الأولى.');
+    } catch {
+      showToast('تعذر النسخ تلقائياً. افتح AIGuidePro وانسخ الرسالة يدوياً.');
+    }
+    const url = course.consultantUrl || 'https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro';
+    openExternal(url);
+  };
+
+  const handleCopyOnlyCourse = async () => {
+    const prompt = composeCoursePrompt();
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        await navigator.clipboard.writeText(prompt);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = prompt;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      showToast('تم النسخ — يمكنك لصق الرسالة في AIGuidePro.');
+    } catch {
+      showToast('تعذر النسخ تلقائياً — انسخ الرسالة يدوياً.');
+    }
   };
   
   return (
@@ -89,9 +194,47 @@ const CourseModal: React.FC<CourseModalProps> = ({ course, onClose }) => {
         </button>
 
         <header className="mb-6 pr-8">
-          <span className="inline-block bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full mb-3 self-start">{course.level}</span>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="inline-block bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full self-start">{course.level}</span>
+            {course.source === 'generated' && (
+              <span className="inline-block bg-orange-500/20 text-orange-300 text-[10px] font-bold px-2 py-0.5 rounded self-start">متولدة تلقائياً</span>
+            )}
+          </div>
           <h2 id="course-title" className="text-3xl font-black text-white">{course.title}</h2>
           <p className="mt-2 text-slate-400">{course.description}</p>
+          <div className="mt-4 flex flex-col md:flex-row md:items-center gap-3">
+            {course.consultantUrl && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSmartHelpCourse}
+                  className="bg-emerald-500 text-white font-bold py-2 px-4 rounded hover:bg-emerald-600"
+                >
+                  مساعدة ذكية للدورة
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyOnlyCourse}
+                  className="bg-slate-700 text-white font-bold py-2 px-3 rounded hover:bg-slate-600"
+                  title="نسخ فقط"
+                >
+                  نسخ فقط
+                </button>
+              </div>
+            )}
+            <label className="inline-flex items-center gap-2 text-slate-300 text-sm select-none">
+              <input
+                type="checkbox"
+                className="accent-emerald-500"
+                checked={includeTopics}
+                onChange={(e) => {
+                  setIncludeTopics(e.target.checked);
+                  try { localStorage.setItem('aiguidepro.includeTopics', String(e.target.checked)); } catch {}
+                }}
+              />
+              تضمين المواضيع في الرسالة
+            </label>
+          </div>
         </header>
         
         <div className="border-t border-slate-700 pt-6 space-y-6">
@@ -99,12 +242,13 @@ const CourseModal: React.FC<CourseModalProps> = ({ course, onClose }) => {
             <h3 className="text-2xl font-bold text-orange-400 mb-4">محتوى الدورة الكامل</h3>
             <div className="border border-slate-700 rounded-lg overflow-hidden">
                 {course.weeks.map((week, index) => (
-                    <AccordionItem 
-                        key={index}
-                        week={week}
-                        isOpen={openWeekIndex === index}
-                        onClick={() => handleWeekClick(index)}
-                    />
+                  <AccordionItem
+                    key={index}
+                    week={week}
+                    isOpen={openWeekIndex === index}
+                    onClick={() => handleWeekClick(index)}
+                    onSmartHelp={() => handleSmartHelp(week)}
+                  />
                 ))}
             </div>
           </div>
@@ -126,6 +270,11 @@ const CourseModal: React.FC<CourseModalProps> = ({ course, onClose }) => {
         </div>
 
       </div>
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white border border-slate-700 px-4 py-2 rounded shadow-lg">
+          {toast}
+        </div>
+      )}
        <style>{`
         @keyframes fade-in {
           from { opacity: 0; transform: scale(0.95); }

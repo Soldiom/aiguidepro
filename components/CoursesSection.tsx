@@ -1,36 +1,66 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import CourseModal from './CourseModal';
+import { getStoredCourses } from '../storage/coursesStorage';
+import type { Course } from '../types/course';
 
-interface Week {
-  title: string;
-  description: string;
-  topics: string[];
-}
+// Types moved to types/course.ts
 
-interface Course {
-  id: number;
-  headline: string;
-  title: string;
-  level: string;
-  description: string;
-  weeks: Week[];
-  details: {
-    type: 'list' | 'text';
-    title?: string;
-    items: string[];
-  }[];
-}
+import { openExternal } from '../utils/openExternal';
 
-const CourseCard: React.FC<{ course: Course; onClick: () => void }> = ({ course, onClick }) => (
-  <button 
-    onClick={onClick}
-    className="bg-slate-800 rounded-lg p-6 border border-slate-700 transition-all duration-300 hover:shadow-lg hover:border-emerald-500 transform hover:-translate-y-1 text-right w-full h-full flex flex-col"
-  >
-    <span className="inline-block bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full mb-3 self-start">{course.level}</span>
-    <h3 className="text-xl font-bold text-white mb-3">{course.title}</h3>
-    <p className="text-slate-400 flex-grow">{course.description.substring(0, 100)}...</p>
-  </button>
-);
+const CourseCard: React.FC<{ course: Course; onClick: () => void; onToast?: (msg: string) => void }> = ({ course, onClick, onToast }) => {
+  const handleQuickHelp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const prompt = `أنت مستشار الذكاء الاصطناعي AIGuidePro. ساعدني بوضوح وبالعربية فقط.\n\nالدورة: ${course.title}\nالمستوى: ${course.level}\nالوصف: ${course.description}\n\nالمطلوب: قدم خطة تعلم سريعة، خطوات تطبيقية، ثم 3 أسئلة تقييم نهائية.`;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard.writeText(prompt);
+      }
+    } catch {}
+    if (onToast) onToast('تم النسخ وفتح AIGuidePro');
+    openExternal(course.consultantUrl || 'https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro');
+  };
+
+  const handleCopyOnly = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const prompt = `أنت مستشار الذكاء الاصطناعي AIGuidePro. ساعدني بوضوح وبالعربية فقط.\n\nالدورة: ${course.title}\nالمستوى: ${course.level}\nالوصف: ${course.description}\n\nالمطلوب: قدم خطة تعلم سريعة، خطوات تطبيقية، ثم 3 أسئلة تقييم نهائية.`;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard.writeText(prompt);
+        if (onToast) onToast('تم نسخ الأمر');
+      }
+    } catch {}
+  };
+
+  return (
+    <div
+      onClick={onClick}
+      className="group bg-slate-800 rounded-lg p-6 border border-slate-700 transition-all duration-300 hover:shadow-lg hover:border-emerald-500 transform hover:-translate-y-1 text-right w-full h-full flex flex-col cursor-pointer"
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <span className="inline-block bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full self-start">{course.level}</span>
+        {course.source === 'generated' && (
+          <span className="inline-block bg-orange-500/20 text-orange-300 text-[10px] font-bold px-2 py-0.5 rounded self-start">جديد</span>
+        )}
+      </div>
+      <h3 className="text-xl font-bold text-white mb-3">{course.title}</h3>
+      <p className="text-slate-400 flex-grow">{course.description.substring(0, 100)}...</p>
+      {course.consultantUrl && (
+        <div className="mt-4 flex gap-2 justify-start opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={handleQuickHelp}
+            className="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded hover:bg-emerald-500"
+            title="مساعدة ذكية"
+          >مساعدة</button>
+          <button
+            onClick={handleCopyOnly}
+            className="bg-slate-700 text-white text-xs font-bold px-3 py-1 rounded hover:bg-slate-600"
+            title="نسخ فقط"
+          >نسخ</button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <h2 className="text-4xl md:text-5xl font-black text-center text-white mb-12">
@@ -40,8 +70,14 @@ const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
 const CoursesSection: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    window.setTimeout(() => setToastMsg(null), 1500);
+  };
 
-  const courses = [
+  // Default static courses (kept as fallback)
+  const defaultCourses: Course[] = [
     { 
       id: 1,
       headline: 'مدخل إلى الذكاء الاصطناعي (AI Intro)',
@@ -180,16 +216,34 @@ const CoursesSection: React.FC = () => {
     },
   ];
 
+  const allCourses = useMemo(() => {
+    const stored = getStoredCourses();
+    // Merge: stored first (admin-generated), then static
+    // Deduplicate by title to avoid near-duplicates
+    const byKey = new Map<string, Course>();
+    stored.forEach(c => byKey.set(c.title, c));
+    defaultCourses.forEach(c => {
+      if (!byKey.has(c.title)) byKey.set(c.title, c);
+    });
+    return Array.from(byKey.values());
+  }, []);
+
   return (
     <section id="courses" className="py-20 md:py-32 px-4 bg-slate-900">
       <div className="container mx-auto max-w-6xl">
         <SectionTitle>دورات تدريبية متخصصة</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {courses.map((course) => (
-            <CourseCard key={course.id} course={course} onClick={() => setSelectedCourse(course)} />
+          {allCourses.map((course) => (
+            <CourseCard key={course.id} course={course} onClick={() => setSelectedCourse(course)} onToast={showToast} />
           ))}
         </div>
       </div>
+      {/* tiny toast */}
+      {toastMsg && (
+        <div className="fixed bottom-4 right-4 bg-slate-800 border border-slate-700 text-slate-200 text-sm px-3 py-2 rounded shadow-lg z-50">
+          {toastMsg}
+        </div>
+      )}
       {selectedCourse && (
         <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
       )}

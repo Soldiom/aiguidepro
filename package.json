@@ -1,5 +1,5 @@
 {
-  "name": "ai-guide-pro---دليلك-العربي-للذكاء-الاصطناعي",
+  "name": "aiguidepro",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "pdfjs-dist": "^4.8.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "vite": "^7.2.2",
-    "@vitejs/plugin-react": "^5.1.0",
-    "@google/genai": "^0.17.0"
+    "react-router-dom": "^6.30.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

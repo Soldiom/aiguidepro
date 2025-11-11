@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { installGlobalDiagnostics } from './diagnostics';
-import { safeRegisterSW, safeUnregisterAllSW } from './sw';
+import { safeRegisterSW, safeUnregisterAllSW } from './sw.ts';
+import { BrowserRouter } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Install global error handlers to catch and log unhandled errors and promise rejections.
 installGlobalDiagnostics();
@@ -33,6 +35,10 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </BrowserRouter>
   </React.StrictMode>
 );

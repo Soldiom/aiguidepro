@@ -1,6 +1,6 @@
 import React from 'react';
-import { bookIntro, bookContent } from '../data/bookData';
-import { GoogleGenAI } from '@google/genai';
+import { bookIntro, bookContentFull as bookContent, hasImportedBook } from '../data/bookData';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import AiModal from './AiModal';
 
 
@@ -22,10 +22,22 @@ const LightBulbIcon = () => (
     </svg>
 );
 
-// Instantiate the GoogleGenAI client once for efficiency.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 const InteractiveBookSection: React.FC = () => {
+  const aiClient = React.useMemo(() => {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      console.warn('[InteractiveBookSection] Missing VITE_GEMINI_API_KEY; AI features disabled.');
+      return null;
+    }
+
+    try {
+      return new GoogleGenerativeAI(apiKey);
+    } catch (err) {
+      console.error('[InteractiveBookSection] Failed to initialize GoogleGenerativeAI client.', err);
+      return null;
+    }
+  }, []);
+
   const allChapterIds = React.useMemo(() => {
     const ids = ['intro'];
     bookContent.forEach(part => {
@@ -52,6 +64,8 @@ const InteractiveBookSection: React.FC = () => {
   const [isLoadingAi, setIsLoadingAi] = React.useState(false);
   const [aiError, setAiError] = React.useState('');
   const [aiModalTitle, setAiModalTitle] = React.useState('');
+  const [easyRead, setEasyRead] = React.useState(false);
+  const [fontScale, setFontScale] = React.useState(1);
 
   const chapterToPartMap = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -132,7 +146,7 @@ const InteractiveBookSection: React.FC = () => {
     if (!contentDisplayRef.current) return;
 
     const textContent = contentDisplayRef.current.innerText;
-    if (!textContent || textContent.trim().length < 50) { // Basic check for content
+  if (!textContent || textContent.trim().length < 50) { // Basic check for content
         setAiModalTitle("خطأ");
         setAiContent('');
         setAiError("لا يوجد محتوى كافٍ للمعالجة.");
@@ -146,22 +160,44 @@ const InteractiveBookSection: React.FC = () => {
     setAiError('');
     setAiContent('');
 
-    const promptText = action === 'summarize'
-        ? `Summarize the following Arabic text about Artificial Intelligence for a beginner. Provide the summary as a markdown list of clear, concise points:\n\n${textContent}`
-        : `Simplify the following Arabic text about Artificial Intelligence for a beginner with no technical background. Use simple language and analogies. IMPORTANT: You must structure your response using short paragraphs and markdown bullet points (e.g., * item) for maximum clarity. Text to simplify:\n\n${textContent}`;
+  const promptText = action === 'summarize'
+    ? `قم بتلخيص النص العربي التالي حول الذكاء الاصطناعي للمبتدئين فقط. التعليمات:
+1. اكتب الرد باللغة العربية الفصحى الواضحة فقط.
+2. يمنع استخدام أي كلمة أو حرف لاتيني أو إنجليزي.
+3. قدم الملخص في شكل قائمة نقطية Markdown (استخدم * قبل كل نقطة).
+4. اجعل كل نقطة قصيرة ومباشرة وتشرح المفهوم ببساطة.
+5. لا تضف مقدمة عامة أو خاتمة، ابدأ مباشرة بالنقاط.
+النص:
+${textContent}
+`
+    : `قم بتبسيط النص العربي التالي حول الذكاء الاصطناعي لشخص لا يمتلك أي خلفية تقنية. التعليمات:
+1. اكتب باللغة العربية الفصحى المبسطة فقط بدون أي مفردات إنجليزية أو لاتينية.
+2. استخدم أمثلة وتشبيهات حياتية قصيرة لتوضيح الأفكار.
+3. قسم الرد إلى فقرات قصيرة منظمة، ويمكنك بعد ذلك إضافة قائمة نقطية Markdown (استخدم * قبل كل نقطة) لأهم النقاط.
+4. تجنب المصطلحات التقنية الصعبة، وإذا اضطررت لذكر مصطلح تقني فسّره فورًا.
+5. لا تستخدم سطر يحتوي على أحرف لاتينية. إذا ظهرت كلمة إنجليزية فهذا يعتبر خطأ.
+النص:
+${textContent}
+`;
     
     setAiModalTitle(action === 'summarize' ? 'ملخص الفصل' : 'تبسيط المحتوى');
 
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: promptText,
-        });
-        setAiContent(response.text);
-    } catch (e) {
-        console.error(e);
-        setAiError('حدث خطأ أثناء معالجة الطلب. يرجى المحاولة مرة أخرى.');
-    } finally {
+  if (!aiClient) {
+    setAiError('ميزة الذكاء الاصطناعي غير متاحة حاليًا. يرجى إعداد مفتاح Gemini في الإعدادات.');
+    setIsLoadingAi(false);
+    return;
+  }
+
+  try {
+    const model = aiClient.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const result = await model.generateContent(promptText);
+    const response = await result.response;
+    setAiContent(response.text());
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    setAiError(`حدث خطأ أثناء معالجة الطلب: ${errorMessage}`);
+  } finally {
         setIsLoadingAi(false);
     }
   };
@@ -265,17 +301,29 @@ const InteractiveBookSection: React.FC = () => {
 
     return (
         <div className="md:col-span-3">
-            <div ref={contentRef} className="p-4 md:max-h-[85vh] overflow-y-auto">
-                <div className="flex items-center gap-4 mb-6 pb-4 border-b border-slate-800">
+      <div ref={contentRef} className="p-4 md:max-h-[85vh] overflow-y-auto">
+        <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-slate-800">
                     <button onClick={() => handleAiAction('summarize')} className="flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold py-2 px-4 rounded-lg hover:bg-emerald-500/20 transition-colors disabled:opacity-50" disabled={isLoadingAi}>
                        <SparklesIcon /> {isLoadingAi ? 'جاري المعالجة...' : 'تلخيص الفصل'}
                     </button>
                     <button onClick={() => handleAiAction('simplify')} className="flex items-center justify-center bg-orange-500/10 text-orange-400 font-bold py-2 px-4 rounded-lg hover:bg-orange-500/20 transition-colors disabled:opacity-50" disabled={isLoadingAi}>
                        <LightBulbIcon /> {isLoadingAi ? 'جاري المعالجة...' : 'تبسيط المحتوى'}
                     </button>
+          <button onClick={() => setEasyRead(v => !v)} className={`flex items-center justify-center ${easyRead ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-200'} font-bold py-2 px-4 rounded-lg hover:bg-emerald-500/80 transition-colors`}>
+            وضع القراءة السهل
+          </button>
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-slate-400 text-xs">حجم الخط</span>
+            <button onClick={() => setFontScale(s => Math.max(0.9, Math.round((s - 0.05) * 100) / 100))} className="bg-slate-700 text-white w-8 h-8 rounded hover:bg-slate-600">-</button>
+            <button onClick={() => setFontScale(s => Math.min(1.3, Math.round((s + 0.05) * 100) / 100))} className="bg-slate-700 text-white w-8 h-8 rounded hover:bg-slate-600">+</button>
+          </div>
                 </div>
 
-                <div ref={contentDisplayRef} className="prose prose-invert prose-p:text-slate-300 prose-headings:text-white prose-h2:text-3xl prose-h2:font-black prose-h3:text-2xl prose-h3:font-bold prose-h3:text-orange-400 prose-strong:text-emerald-400 prose-ul:list-disc prose-li:my-1 max-w-none prose-a:text-emerald-400 hover:prose-a:text-emerald-300">
+        <div
+          ref={contentDisplayRef}
+          className={`prose prose-invert max-w-none rounded-xl bg-slate-900/40 p-4 ${easyRead ? 'prose-lg md:prose-xl leading-loose' : 'prose-p:text-slate-300'} prose-headings:text-white prose-h2:text-3xl prose-h2:font-black prose-h3:text-2xl prose-h3:font-bold prose-h3:text-orange-400 prose-strong:text-emerald-400 prose-ul:list-disc prose-li:my-1 prose-a:text-emerald-400 hover:prose-a:text-emerald-300`}
+          style={{ fontSize: `${fontScale}em` }}
+        >
                     {currentContent}
                 </div>
             </div>
@@ -312,6 +360,9 @@ const InteractiveBookSection: React.FC = () => {
     <section className="py-20 md:py-32 px-4 bg-slate-900/70 backdrop-blur-sm">
       <div className="container mx-auto max-w-7xl">
         <SectionTitle>تصفح كتاب إتقان الذكاء الاصطناعي</SectionTitle>
+        <p className="text-center text-amber-400 -mt-12 mb-12 text-sm">
+          📖 ملاحظة: المعروض هنا نسخة مختصرة من الكتاب وليس الكتاب الكامل
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12">
           {renderTOC()}
           {renderContent()}

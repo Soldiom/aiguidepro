@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Hero from './components/Hero';
 import IntroductionSection from './components/IntroductionSection';
 import ToolsShowcaseSection from './components/ToolsShowcaseSection';
@@ -8,6 +8,15 @@ import Footer from './components/Footer';
 import SideMenu from './components/SideMenu';
 import CoursesSection from './components/CoursesSection';
 import CallToActionSection from './components/CallToActionSection';
+import VisionMissionSection from './components/VisionMissionSection';
+import CommunityVoting from './components/CommunityVoting';
+import NewsArabic from './components/NewsArabic';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import AdminCourseGenerator from './components/AdminCourseGenerator';
+import CourseSuggestionsVoting from './components/CourseSuggestionsVoting';
+import PdfImporter from './components/PdfImporter';
+import { isAdmin, setAdmin } from './utils/admin';
+import { startAutoCourseFlow } from './services/autoCourseOrchestrator';
 
 const MenuIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -23,50 +32,33 @@ const CloseIcon = () => (
 
 
 const App: React.FC = () => {
-    const [view, setView] = useState<'home' | 'tools' | 'book'>('home');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
+    const [canAdmin, setCanAdmin] = useState<boolean>(isAdmin());
 
-    const handleNavigate = (targetView: 'home' | 'tools' | 'book') => {
-        setView(targetView);
-        setIsMenuOpen(false); // Close menu on navigation
-    };
+    // Close the mobile menu on route change
+    useEffect(() => {
+        setIsMenuOpen(false);
+        // allow enabling admin via query param admin=1
+        try {
+            const params = new URLSearchParams(location.search);
+            if (params.get('admin') === '1') {
+                setAdmin(true);
+            }
+        } catch {}
+        setCanAdmin(isAdmin());
+    }, [location.pathname, location.hash]);
 
-    const renderContent = () => {
-        switch (view) {
-            case 'home':
-                return (
-                    <>
-                        <Hero />
-                        <div className="relative z-10">
-                            <IntroductionSection />
-                            <CoursesSection />
-                            <CallToActionSection />
-                        </div>
-                    </>
-                );
-            case 'tools':
-                return (
-                    <div className="relative z-10 py-10">
-                        <ToolsShowcaseSection />
-                        <GptToolsSection />
-                    </div>
-                );
-            case 'book':
-                return (
-                    <div className="relative z-10 py-10">
-                        <InteractiveBookSection />
-                    </div>
-                );
-            default:
-                return <Hero />;
-        }
-    };
+    // Start background automation once on first mount
+    useEffect(() => {
+        startAutoCourseFlow();
+    }, []);
 
     return (
         <div className="min-h-screen bg-slate-900 flex">
             {/* Sidebar for desktop */}
             <div className="hidden md:block md:w-64 lg:w-72 flex-shrink-0">
-                 <SideMenu activeView={view} onNavigate={handleNavigate} className="fixed top-0 right-0 h-full w-64 lg:w-72" />
+                 <SideMenu className="fixed top-0 right-0 h-full w-64 lg:w-72" />
             </div>
 
             {/* Mobile menu overlay */}
@@ -76,7 +68,7 @@ const App: React.FC = () => {
             
             {/* Mobile Sidebar */}
             <div className={`md:hidden fixed top-0 right-0 h-full w-64 bg-slate-800 z-50 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                 <SideMenu activeView={view} onNavigate={handleNavigate} />
+              <SideMenu />
             </div>
             
             {/* Main Content */}
@@ -90,7 +82,70 @@ const App: React.FC = () => {
                 </header>
 
                 <main className="flex-1 overflow-y-auto">
-                    {renderContent()}
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={
+                                <>
+                                    <Hero />
+                                    <div className="relative z-10">
+                                        <IntroductionSection />
+                                        <VisionMissionSection />
+                                        <CoursesSection />
+                                        <CallToActionSection />
+                                    </div>
+                                </>
+                            }
+                        />
+                        <Route
+                            path="/adminali"
+                            element={
+                                <div className="relative z-10">
+                                    {canAdmin ? (
+                                        <>
+                                            <AdminCourseGenerator />
+                                            <CourseSuggestionsVoting />
+                                            <PdfImporter />
+                                        </>
+                                    ) : (
+                                        <div className="py-32 text-center text-slate-300">
+                                            <h2 className="text-3xl font-bold mb-4 text-white">غير مصرح</h2>
+                                            <p className="mb-6">هذه الصفحة مخصصة للمسؤول فقط.</p>
+                                            <p className="text-sm text-slate-500">(أضف ?admin=1 إلى الرابط لتمكين وضع الإدارة محلياً)</p>
+                                        </div>
+                                    )}
+                                </div>
+                            }
+                        />
+                        <Route
+                            path="/tools"
+                            element={
+                                <div className="relative z-10 py-10">
+                                    <ToolsShowcaseSection />
+                                    <GptToolsSection />
+                                </div>
+                            }
+                        />
+                        <Route
+                            path="/book"
+                            element={
+                                <div className="relative z-10 py-10">
+                                    <InteractiveBookSection />
+                                </div>
+                            }
+                        />
+                        <Route
+                            path="/vote"
+                            element={<CommunityVoting />}
+                        />
+                        <Route
+                            path="/news"
+                            element={<NewsArabic />}
+                        />
+                        <Route path="/about" element={React.createElement(require('./components/About').default)} />
+                        {/* 404 fallback */}
+                        <Route path="*" element={React.createElement(require('./components/NotFound').default)} />
+                    </Routes>
                     <Footer />
                 </main>
             </div>

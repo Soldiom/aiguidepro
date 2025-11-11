@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { isAdmin } from '../utils/admin';
 
 // Icons as simple SVG components
 const HomeIcon = () => (
@@ -18,43 +20,21 @@ const BookIcon = () => (
     </svg>
 );
 
-type View = 'home' | 'tools' | 'book';
+interface SideMenuProps { className?: string; }
 
-interface SideMenuProps {
-    activeView: View;
-    onNavigate: (view: View) => void;
-    className?: string;
-}
-
-const NavLink: React.FC<{
-    view: View;
-    activeView: View;
-    onNavigate: (view: View) => void;
-    children: React.ReactNode;
-}> = ({ view, activeView, onNavigate, children }) => {
-    const isActive = activeView === view;
-    return (
-        <li>
-            <a
-                href="#"
-                onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate(view);
-                }}
-                className={`flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${
-                    isActive
-                        ? 'bg-emerald-500/10 text-emerald-300 font-bold'
-                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-                }`}
-            >
-                {children}
-            </a>
-        </li>
-    );
-};
-
-
-const SideMenu: React.FC<SideMenuProps> = ({ activeView, onNavigate, className }) => {
+const SideMenu: React.FC<SideMenuProps> = ({ className }) => {
+    const [admin, setAdmin] = useState(false);
+    useEffect(() => {
+        setAdmin(isAdmin());
+        const onStorage = () => setAdmin(isAdmin());
+        const onCustom = () => setAdmin(isAdmin());
+        window.addEventListener('storage', onStorage);
+        window.addEventListener('aiguidepro-admin-change', onCustom as EventListener);
+        return () => {
+            window.removeEventListener('storage', onStorage);
+            window.removeEventListener('aiguidepro-admin-change', onCustom as EventListener);
+        };
+    }, []);
     return (
         <aside className={`bg-slate-800 p-6 border-l border-slate-700 h-full flex flex-col ${className}`}>
             <div className="mb-10 text-center">
@@ -63,18 +43,79 @@ const SideMenu: React.FC<SideMenuProps> = ({ activeView, onNavigate, className }
             </div>
             <nav>
                 <ul className="space-y-4">
-                    <NavLink view="home" activeView={activeView} onNavigate={onNavigate}>
-                        <HomeIcon />
-                        الرئيسية
-                    </NavLink>
-                    <NavLink view="tools" activeView={activeView} onNavigate={onNavigate}>
-                        <ToolsIcon />
-                        الأدوات
-                    </NavLink>
-                    <NavLink view="book" activeView={activeView} onNavigate={onNavigate}>
-                        <BookIcon />
-                        الكتاب
-                    </NavLink>
+                    <li>
+                        <NavLink
+                            to="/"
+                            end
+                            className={({ isActive }) => `flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${isActive ? 'bg-emerald-500/10 text-emerald-300 font-bold' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+                        >
+                            <HomeIcon />
+                            الرئيسية
+                        </NavLink>
+                    </li>
+                    <li>
+                        <a
+                            href="/#vision"
+                            className="flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 text-slate-300 hover:bg-slate-700 hover:text-white"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            رؤيتنا ورسالتنا
+                        </a>
+                    </li>
+                    <li>
+                        <NavLink
+                            to="/tools"
+                            className={({ isActive }) => `flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${isActive ? 'bg-emerald-500/10 text-emerald-300 font-bold' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+                        >
+                            <ToolsIcon />
+                            الأدوات
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            to="/vote"
+                            className={({ isActive }) => `flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${isActive ? 'bg-emerald-500/10 text-emerald-300 font-bold' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-6a2 2 0 012-2h8" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h6a2 2 0 012 2v6a2 2 0 01-2 2H3V7z" />
+                            </svg>
+                            تصويت الدورات
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            to="/book"
+                            className={({ isActive }) => `flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${isActive ? 'bg-emerald-500/10 text-emerald-300 font-bold' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+                        >
+                            <BookIcon />
+                            الكتاب
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            to="/news"
+                            className={({ isActive }) => `flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${isActive ? 'bg-emerald-500/10 text-emerald-300 font-bold' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2z" />
+                            </svg>
+                            الأخبار والأبحاث
+                        </NavLink>
+                    </li>
+                        {admin && (
+                            <li>
+                                <NavLink
+                                    to="/adminali"
+                                    className={({ isActive }) => `flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${isActive ? 'bg-emerald-500/10 text-emerald-300 font-bold' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+                                >
+                                    إدارة الدورات
+                                </NavLink>
+                            </li>
+                        )}
                 </ul>
             </nav>
         </aside>
