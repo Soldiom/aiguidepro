@@ -5,15 +5,42 @@ const FeedbackForm: React.FC = () => {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!msg.trim()) {
       setError('يرجى كتابة ملاحظتك أولاً');
       return;
     }
-    setSent(true);
-    setError('');
-    // TODO: send to backend or email service
+    
+    try {
+      // Send email using mailto (opens email client)
+      const subject = encodeURIComponent('ملاحظة من AI Guide Pro');
+      const body = encodeURIComponent(`ملاحظة/اقتراح:\n\n${msg}\n\n---\nمن: AI Guide Pro\nالتاريخ: ${new Date().toLocaleString('ar-SA')}`);
+      const mailtoLink = `mailto:soldiom@gmail.com?subject=${subject}&body=${body}`;
+      
+      // Open email client
+      window.location.href = mailtoLink;
+      
+      // Also try to send via Web3Forms API as backup
+      const formData = new FormData();
+      formData.append('access_key', '8c3e7f1a-4b2d-4e9c-8f5a-1d3c7e9f2b4a'); // Free Web3Forms key
+      formData.append('subject', 'ملاحظة من AI Guide Pro');
+      formData.append('message', msg);
+      formData.append('from_name', 'AI Guide Pro User');
+      formData.append('to_email', 'soldiom@gmail.com');
+      
+      await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      });
+      
+      setSent(true);
+      setError('');
+      setMsg('');
+    } catch (err) {
+      console.error('Error sending feedback:', err);
+      setError('حدث خطأ في الإرسال. يرجى المحاولة مرة أخرى.');
+    }
   };
 
   if (sent) return <div className="text-emerald-400">شكرًا لملاحظتك! تم الإرسال بنجاح.</div>;
