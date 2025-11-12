@@ -12,6 +12,8 @@ import VisionMissionSection from './components/VisionMissionSection';
 import CommunityVoting from './components/CommunityVoting';
 import NewsArabicImproved from './components/NewsArabicImproved';
 import AIFeaturesPage from './components/AIFeaturesPage';
+import CoursesPage from './components/CoursesPage';
+import NoraChatBot from './components/NoraChatBot';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminCourseGenerator from './components/AdminCourseGenerator';
 import CourseSuggestionsVoting from './components/CourseSuggestionsVoting';
@@ -147,6 +149,10 @@ const App: React.FC = () => {
                             path="/ai-features"
                             element={<AIFeaturesPage />}
                         />
+                        <Route
+                            path="/courses"
+                            element={<CoursesPage />}
+                        />
         <Route path="/about" element={
                             <div className="relative z-10 py-20 px-4 max-w-4xl mx-auto">
                                 <h1 className="text-4xl font-bold text-white mb-6">عن المنصة</h1>
@@ -161,6 +167,9 @@ const App: React.FC = () => {
                     <Footer />
                 </main>
             </div>
+            
+            {/* Nora AI ChatBot - Available on all pages */}
+            <NoraChatBot />
         </div>
     );
 };
