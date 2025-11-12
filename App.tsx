@@ -84,7 +84,7 @@ const App: React.FC = () => {
                 <main className="flex-1 overflow-y-auto">
                     <Routes>
                         <Route
-                            path="/"
+                            index
                             element={
                                 <>
                                     <Hero />
@@ -151,13 +151,7 @@ const App: React.FC = () => {
                                 </div>
                             </div>
                         } />
-        {/* 404 fallback */}
-        <Route path="*" element={
-                            <div className="relative z-10 py-20 px-4 text-center">
-                                <h1 className="text-6xl font-bold text-white mb-4">404</h1>
-                                <p className="text-xl text-slate-400">الصفحة غير موجودة</p>
-                            </div>
-                        } />
+
                     </Routes>
                     <Footer />
                 </main>
