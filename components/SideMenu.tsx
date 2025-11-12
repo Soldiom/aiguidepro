@@ -55,7 +55,16 @@ const SideMenu: React.FC<SideMenuProps> = ({ className }) => {
                     </li>
                     <li>
                         <a
-                            href="/#vision"
+                            href="#vision"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                const element = document.getElementById('vision');
+                                if (element) {
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                } else {
+                                    window.location.href = '/#vision';
+                                }
+                            }}
                             className="flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 text-slate-300 hover:bg-slate-700 hover:text-white"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

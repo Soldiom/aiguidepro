@@ -10,7 +10,7 @@ import CoursesSection from './components/CoursesSection';
 import CallToActionSection from './components/CallToActionSection';
 import VisionMissionSection from './components/VisionMissionSection';
 import CommunityVoting from './components/CommunityVoting';
-import NewsArabic from './components/NewsArabic';
+import NewsArabicImproved from './components/NewsArabicImproved';
 import AIFeaturesPage from './components/AIFeaturesPage';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminCourseGenerator from './components/AdminCourseGenerator';
@@ -141,7 +141,7 @@ const App: React.FC = () => {
                         />
                         <Route
                             path="/news"
-                            element={<NewsArabic />}
+                            element={<NewsArabicImproved />}
                         />
                         <Route
                             path="/ai-features"

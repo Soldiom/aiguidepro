@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import AIChatAssistant from './AIChatAssistant';
-import AIModelPlayground from './AIModelPlayground';
+import AIModelPlaygroundFixed from './AIModelPlaygroundFixed';
 import GitHubCodeExamples from './GitHubCodeExamples';
 import CodePlayground from './CodePlayground';
 import SmartLearningPath from './SmartLearningPath';
+import CourseGenerator from './CourseGenerator';
 
 const AIFeaturesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('chat');
 
   const tabs = [
     { id: 'chat', name: 'مساعد AI', icon: '🤖', component: AIChatAssistant },
-    { id: 'playground', name: 'ساحة النماذج', icon: '🧪', component: AIModelPlayground },
+    { id: 'playground', name: 'ساحة النماذج', icon: '🧪', component: AIModelPlaygroundFixed },
     { id: 'code', name: 'ساحة البرمجة', icon: '💻', component: CodePlayground },
     { id: 'examples', name: 'أمثلة GitHub', icon: '📚', component: GitHubCodeExamples },
-    { id: 'learning', name: 'مسار التعلم', icon: '🎯', component: SmartLearningPath }
+    { id: 'learning', name: 'مسار التعلم', icon: '🎯', component: SmartLearningPath },
+    { id: 'course-gen', name: 'مولد الدورات', icon: '🎓', component: CourseGenerator }
   ];
 
   const ActiveComponent = tabs.find(t => t.id === activeTab)?.component || AIChatAssistant;
