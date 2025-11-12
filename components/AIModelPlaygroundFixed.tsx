@@ -225,11 +225,15 @@ const AIModelPlaygroundFixed: React.FC = () => {
         </div>
       )}
 
-      {/* Info Box */}
-      <div className="mt-6 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-        <p className="text-sm text-blue-300">
-          💡 **نصيحة:** هذه النماذج تعمل مباشرة في المتصفح باستخدام Hugging Face Inference API.
-          للحصول على نتائج أفضل، يمكنك استخدام Gemini API أو OpenAI API.
+       {/* Info Box */}
+      <div className="mt-6 bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+        <p className="text-sm text-emerald-300 mb-2">
+          ✨ **الوضع التجريبي:** هذه الميزات تعمل في الوضع التجريبي حالياً.
+        </p>
+        <p className="text-xs text-emerald-400">
+          💡 للحصول على نتائج حقيقية قوية، استخدم <strong>AIGuidePro ChatGPT</strong> - مستشارك الشخصي في الذكاء الاصطناعي!
+          <br/>
+          🔗 <a href="https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro" target="_blank" className="underline hover:text-white">اضغط هنا للوصول إلى AIGuidePro</a>
         </p>
       </div>
 

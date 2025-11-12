@@ -41,42 +41,23 @@ const AIChatAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Use Gemini API for Arabic AI assistance
-      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=' + import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `أنت مساعد ذكي متخصص في تعليم الذكاء الاصطناعي باللغة العربية. أجب على السؤال التالي بطريقة واضحة ومفيدة:\n\n${input}`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1024,
-          }
-        })
-      });
-
-      const data = await response.json();
+      // Demo mode - redirect to AIGuidePro ChatGPT
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.candidates?.[0]?.content?.parts?.[0]?.text || 'عذراً، حدث خطأ في معالجة طلبك.',
+        content: `✨ **الوضع التجريبي**\n\nشكراً لسؤالك: "${input}"\n\n💡 للحصول على إجابات حقيقية ومتقدمة، استخدم **AIGuidePro ChatGPT** - مستشارك الشخصي في الذكاء الاصطناعي!\n\n🔗 [اضغط هنا للوصول إلى AIGuidePro](https://chatgpt.com/g/g-sw3sWxPbP-aiguidepro)\n\n**ما يمكن لـ AIGuidePro فعله:**\n✅ الإجابة على جميع أسئلتك عن الذكاء الاصطناعي\n✅ توليد دورات تدريبية كاملة مخصصة لك\n✅ كتابة الأكواد البرمجية\n✅ شرح المفاهيم المعقدة ببساطة\n✅ مساعدتك في مشاريعك`,
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      setIsLoading(false);
     } catch (error) {
-      console.error('Error calling AI:', error);
+      console.error('Error:', error);
       const errorMessage: Message = {
         role: 'assistant',
-        content: 'عذراً، حدث خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.',
+        content: 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
-    } finally {
       setIsLoading(false);
     }
   };
