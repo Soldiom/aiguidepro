@@ -1,7 +1,7 @@
 import React from 'react';
 import { bookIntro, bookContentFull as bookContent, hasImportedBook } from '../data/bookData';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import AiModal from './AiModal';
+import { summarizeChapter, simplifyContent } from '../services/geminiService';
 
 
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -23,20 +23,6 @@ const LightBulbIcon = () => (
 );
 
 const InteractiveBookSection: React.FC = () => {
-  const aiClient = React.useMemo(() => {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
-      console.warn('[InteractiveBookSection] Missing VITE_GEMINI_API_KEY; AI features disabled.');
-      return null;
-    }
-
-    try {
-      return new GoogleGenerativeAI(apiKey);
-    } catch (err) {
-      console.error('[InteractiveBookSection] Failed to initialize GoogleGenerativeAI client.', err);
-      return null;
-    }
-  }, []);
 
   const allChapterIds = React.useMemo(() => {
     const ids = ['intro'];
@@ -146,7 +132,7 @@ const InteractiveBookSection: React.FC = () => {
     if (!contentDisplayRef.current) return;
 
     const textContent = contentDisplayRef.current.innerText;
-  if (!textContent || textContent.trim().length < 50) { // Basic check for content
+    if (!textContent || textContent.trim().length < 50) {
         setAiModalTitle("خطأ");
         setAiContent('');
         setAiError("لا يوجد محتوى كافٍ للمعالجة.");
@@ -159,46 +145,38 @@ const InteractiveBookSection: React.FC = () => {
     setIsLoadingAi(true);
     setAiError('');
     setAiContent('');
-
-  const promptText = action === 'summarize'
-    ? `قم بتلخيص النص العربي التالي حول الذكاء الاصطناعي للمبتدئين فقط. التعليمات:
-1. اكتب الرد باللغة العربية الفصحى الواضحة فقط.
-2. يمنع استخدام أي كلمة أو حرف لاتيني أو إنجليزي.
-3. قدم الملخص في شكل قائمة نقطية Markdown (استخدم * قبل كل نقطة).
-4. اجعل كل نقطة قصيرة ومباشرة وتشرح المفهوم ببساطة.
-5. لا تضف مقدمة عامة أو خاتمة، ابدأ مباشرة بالنقاط.
-النص:
-${textContent}
-`
-    : `قم بتبسيط النص العربي التالي حول الذكاء الاصطناعي لشخص لا يمتلك أي خلفية تقنية. التعليمات:
-1. اكتب باللغة العربية الفصحى المبسطة فقط بدون أي مفردات إنجليزية أو لاتينية.
-2. استخدم أمثلة وتشبيهات حياتية قصيرة لتوضيح الأفكار.
-3. قسم الرد إلى فقرات قصيرة منظمة، ويمكنك بعد ذلك إضافة قائمة نقطية Markdown (استخدم * قبل كل نقطة) لأهم النقاط.
-4. تجنب المصطلحات التقنية الصعبة، وإذا اضطررت لذكر مصطلح تقني فسّره فورًا.
-5. لا تستخدم سطر يحتوي على أحرف لاتينية. إذا ظهرت كلمة إنجليزية فهذا يعتبر خطأ.
-النص:
-${textContent}
-`;
     
     setAiModalTitle(action === 'summarize' ? 'ملخص الفصل' : 'تبسيط المحتوى');
 
-  if (!aiClient) {
-    setAiError('ميزة الذكاء الاصطناعي غير متاحة حاليًا. يرجى إعداد مفتاح Gemini في الإعدادات.');
-    setIsLoadingAi(false);
-    return;
-  }
+    try {
+      // Get current chapter title
+      let chapterTitle = 'الفصل الحالي';
+      if (activeId === 'intro') {
+        chapterTitle = 'مقدمة الكتاب';
+      } else {
+        for (const part of bookContent) {
+          const chapter = part.chapters.find(ch => ch.id === activeId);
+          if (chapter) {
+            chapterTitle = chapter.title;
+            break;
+          }
+        }
+      }
 
-  try {
-    const model = aiClient.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-    const result = await model.generateContent(promptText);
-    const response = await result.response;
-    setAiContent(response.text());
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    setAiError(`حدث خطأ أثناء معالجة الطلب: ${errorMessage}`);
-  } finally {
-        setIsLoadingAi(false);
+      let result: string;
+      if (action === 'summarize') {
+        result = await summarizeChapter(chapterTitle, textContent);
+      } else {
+        result = await simplifyContent(chapterTitle, textContent);
+      }
+      
+      setAiContent(result);
+    } catch (e) {
+      console.error(e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      setAiError(`حدث خطأ أثناء معالجة الطلب: ${errorMessage}`);
+    } finally {
+      setIsLoadingAi(false);
     }
   };
 
