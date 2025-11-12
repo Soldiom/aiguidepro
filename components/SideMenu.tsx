@@ -106,6 +106,17 @@ const SideMenu: React.FC<SideMenuProps> = ({ className }) => {
                             الأخبار والأبحاث
                         </NavLink>
                     </li>
+                    <li>
+                        <NavLink
+                            to="/ai-features"
+                            className={({ isActive }) => `flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${isActive ? 'bg-gradient-to-r from-purple-500 to-emerald-500 text-white font-bold' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            ميزات AI 🚀
+                        </NavLink>
+                    </li>
                         {admin && (
                             <li>
                                 <NavLink

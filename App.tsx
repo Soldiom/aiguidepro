@@ -11,6 +11,7 @@ import CallToActionSection from './components/CallToActionSection';
 import VisionMissionSection from './components/VisionMissionSection';
 import CommunityVoting from './components/CommunityVoting';
 import NewsArabic from './components/NewsArabic';
+import AIFeaturesPage from './components/AIFeaturesPage';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminCourseGenerator from './components/AdminCourseGenerator';
 import CourseSuggestionsVoting from './components/CourseSuggestionsVoting';
@@ -141,6 +142,10 @@ const App: React.FC = () => {
                         <Route
                             path="/news"
                             element={<NewsArabic />}
+                        />
+                        <Route
+                            path="/ai-features"
+                            element={<AIFeaturesPage />}
                         />
         <Route path="/about" element={
                             <div className="relative z-10 py-20 px-4 max-w-4xl mx-auto">
