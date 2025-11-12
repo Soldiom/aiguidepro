@@ -85,7 +85,7 @@ const App: React.FC = () => {
                 <main className="flex-1 overflow-y-auto">
                     <Routes>
                         <Route
-                            index
+                            path="/"
                             element={
                                 <>
                                     <Hero />
