@@ -25,10 +25,11 @@ const NewsArabicImproved: React.FC = () => {
     try {
       setLoading(true);
       
-      // Fetch from arXiv API
+      // Fetch from arXiv API using CORS proxy
       const searchQuery = 'cat:cs.AI OR cat:cs.LG OR cat:cs.CL OR cat:cs.CV';
       const maxResults = 20;
-      const url = `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(searchQuery)}&start=0&max_results=${maxResults}&sortBy=submittedDate&sortOrder=descending`;
+      const arxivUrl = `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(searchQuery)}&start=0&max_results=${maxResults}&sortBy=submittedDate&sortOrder=descending`;
+      const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(arxivUrl)}`;
       
       const response = await fetch(url);
       const xmlText = await response.text();
