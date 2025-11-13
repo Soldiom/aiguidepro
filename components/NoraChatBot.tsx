@@ -46,7 +46,13 @@ const NoraChatBot: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await chatWithNora(input);
+      // Build conversation history for context
+      const conversationHistory = messages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
+      const response = await chatWithNora(input, conversationHistory);
       
       const noraMessage: Message = {
         id: (Date.now() + 1).toString(),
