@@ -159,6 +159,8 @@ This repository now includes comprehensive guides for building a **100X Online A
 
 ### 📚 Documentation
 
+**Start Here**: [AI_GUIDE_INDEX.md](./AI_GUIDE_INDEX.md) - Complete documentation index with learning paths
+
 #### Core Guides
 
 1. **[100X_AI_AGENT_GUIDE.md](./100X_AI_AGENT_GUIDE.md)** - Complete overview of the 100X AI Agent System
@@ -192,6 +194,13 @@ This repository now includes comprehensive guides for building a **100X Online A
    - Cloud platforms (EKS, GKE, AKS)
    - Production best practices
    - Monitoring and observability
+
+5. **[ARCHITECTURE_DIAGRAMS.md](./ARCHITECTURE_DIAGRAMS.md)** - Visual architecture guide
+   - System architecture diagrams
+   - Component interaction flows
+   - Deployment architectures
+   - Data flow diagrams
+   - Decision trees and cheat sheets
 
 ### ⚡ Quick Start Scripts
 
