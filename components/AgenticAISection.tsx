@@ -68,12 +68,12 @@ const AgenticAISection: React.FC = () => {
             فريق من الوكلاء الأذكياء يعملون لك على مدار الساعة. فقط أخبرهم بما تريد، وسيقومون بالباقي تلقائياً.
           </p>
           
-          {/* Manus Badge */}
-          <div className="mt-8 inline-flex items-center gap-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30 rounded-full px-6 py-3">
-            <span className="text-2xl">⚡</span>
+          {/* AI Guide Pro Badge */}
+          <div className="mt-8 inline-flex items-center gap-3 bg-gradient-to-r from-emerald-600/20 to-teal-600/20 border border-emerald-500/30 rounded-full px-6 py-3">
+            <span className="text-2xl">🤖</span>
             <div className="text-right">
-              <div className="text-sm text-purple-300 font-semibold">مدعوم بـ</div>
-              <div className="text-lg font-bold text-white">Manus Open Source</div>
+              <div className="text-sm text-emerald-300 font-semibold">مدعوم بـ</div>
+              <div className="text-lg font-bold text-white">AI Guide Pro Unified System</div>
             </div>
           </div>
         </div>
@@ -196,16 +196,16 @@ const AgenticAISection: React.FC = () => {
           </div>
         </div>
 
-        {/* Manus Open Source */}
-        <div className="bg-gradient-to-br from-purple-900/30 via-blue-900/30 to-cyan-900/30 border border-purple-500/30 rounded-2xl p-8 text-center">
+        {/* AI Guide Pro Unified System */}
+        <div className="bg-gradient-to-br from-emerald-900/30 via-teal-900/30 to-cyan-900/30 border border-emerald-500/30 rounded-2xl p-8 text-center">
           <div className="mb-6">
-            <span className="text-6xl">⚡</span>
+            <span className="text-6xl">🎓</span>
           </div>
           <h3 className="text-3xl font-bold text-white mb-4">
-            Manus Open Source
+            AI Guide Pro Unified System
           </h3>
           <p className="text-xl text-slate-300 mb-6 max-w-2xl mx-auto">
-            منصة مفتوحة المصدر لبناء وتشغيل Agentic AI Agents. قوية، مرنة، وسهلة الاستخدام.
+            نظام موحد متكامل لتشغيل وإدارة Agentic AI Agents. قوي، ذكي، ومصمم خصيصاً لاحتياجاتك.
           </p>
           
           <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -215,35 +215,31 @@ const AgenticAISection: React.FC = () => {
               <p className="text-sm text-slate-400">معالجة متوازية وأداء عالي</p>
             </div>
             <div className="bg-slate-800/50 rounded-lg p-4">
-              <div className="text-3xl mb-2">🔧</div>
-              <h4 className="font-bold text-white mb-2">قابل للتخصيص</h4>
-              <p className="text-sm text-slate-400">صمم وكلاء مخصصين لاحتياجاتك</p>
+              <div className="text-3xl mb-2">🧠</div>
+              <h4 className="font-bold text-white mb-2">ذكاء متقدم</h4>
+              <p className="text-sm text-slate-400">وكلاء أذكياء بقدرات تعلم ذاتي</p>
             </div>
             <div className="bg-slate-800/50 rounded-lg p-4">
-              <div className="text-3xl mb-2">🌍</div>
-              <h4 className="font-bold text-white mb-2">مفتوح المصدر</h4>
-              <p className="text-sm text-slate-400">مجاني للجميع، مدعوم من المجتمع</p>
+              <div className="text-3xl mb-2">🎯</div>
+              <h4 className="font-bold text-white mb-2">موحد ومتكامل</h4>
+              <p className="text-sm text-slate-400">نظام شامل لجميع احتياجاتك</p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="https://manus.im"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              href="/courses"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
             >
-              <span>جرب Manus مجاناً</span>
+              <span>ابدأ التعلم الآن</span>
               <span>→</span>
             </a>
             <a
-              href="https://github.com/manus-platform"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/vote"
               className="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 border border-slate-600"
             >
-              <span>استكشف الكود</span>
-              <span>⭐</span>
+              <span>اقترح دورة جديدة</span>
+              <span>💡</span>
             </a>
           </div>
         </div>
@@ -254,10 +250,8 @@ const AgenticAISection: React.FC = () => {
             هل أنت مستعد لتوظيف فريق AI الخاص بك؟
           </p>
           <a
-            href="https://manus.im"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold px-10 py-5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 hover:scale-105 text-lg"
+            href="/courses"
+            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-10 py-5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/50 hover:scale-105 text-lg"
           >
             <span>ابدأ الآن مجاناً</span>
             <span className="text-2xl">🚀</span>
