@@ -11,6 +11,7 @@ import CallToActionSection from './components/CallToActionSection';
 import VisionMissionSection from './components/VisionMissionSection';
 import CommunityVoting from './components/CommunityVoting';
 import NewsArabicImproved from './components/NewsArabicImproved';
+import AgenticAISection from './components/AgenticAISection';
 import AIFeaturesPage from './components/AIFeaturesPage';
 import CoursesPage from './components/CoursesPage';
 import NoraChatBot from './components/NoraChatBot';
@@ -94,6 +95,7 @@ const App: React.FC = () => {
                                     <div className="relative z-10">
                                         <IntroductionSection />
                                         <VisionMissionSection />
+                                        <AgenticAISection />
                                         <CoursesSection />
                                         <CallToActionSection />
                                     </div>
