@@ -228,11 +228,13 @@ const AgenticAISection: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/courses"
+              href="https://3000-i0w99un5bzd0a7a1vp6nc-71ef756c.manus-asia.computer"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
             >
-              <span>ابدأ التعلم الآن</span>
-              <span>→</span>
+              <span>جرب النظام الموحد</span>
+              <span>🚀</span>
             </a>
             <a
               href="/vote"
@@ -250,7 +252,9 @@ const AgenticAISection: React.FC = () => {
             هل أنت مستعد لتوظيف فريق AI الخاص بك؟
           </p>
           <a
-            href="/courses"
+            href="https://3000-i0w99un5bzd0a7a1vp6nc-71ef756c.manus-asia.computer"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-10 py-5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/50 hover:scale-105 text-lg"
           >
             <span>ابدأ الآن مجاناً</span>
