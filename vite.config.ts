@@ -11,6 +11,40 @@ export default defineConfig({
         {
           src: 'public/*',
           dest: '.'
+        },
+        // Copy AI Agent System documentation files
+        {
+          src: '100X_AI_AGENT_GUIDE.md',
+          dest: '.'
+        },
+        {
+          src: 'AI_GUIDE_INDEX.md',
+          dest: '.'
+        },
+        {
+          src: 'ARCHITECTURE_DIAGRAMS.md',
+          dest: '.'
+        },
+        {
+          src: 'CURATED_RESOURCES.md',
+          dest: '.'
+        },
+        {
+          src: 'DEPLOYMENT_GUIDE.md',
+          dest: '.'
+        },
+        {
+          src: 'IMPLEMENTATION_GUIDES.md',
+          dest: '.'
+        },
+        {
+          src: 'IMPLEMENTATION_SUMMARY.md',
+          dest: '.'
+        },
+        // Copy quickstart scripts directory
+        {
+          src: 'quickstart-scripts',
+          dest: '.'
         }
       ]
     })
