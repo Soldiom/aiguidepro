@@ -21,6 +21,8 @@ import CourseSuggestionsVoting from './components/CourseSuggestionsVoting';
 import PdfImporter from './components/PdfImporter';
 import { isAdmin, setAdmin } from './utils/admin';
 import { startAutoCourseFlow } from './services/autoCourseOrchestrator';
+import { runNewsOrchestrator } from './services/newsOrchestrator';
+import { scheduleBackgroundTasks } from './utils/backgroundTasks';
 
 const MenuIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -55,7 +57,27 @@ const App: React.FC = () => {
 
     // Start background automation once on first mount
     useEffect(() => {
-        startAutoCourseFlow();
+        if (typeof window === 'undefined') return;
+        const triggerTasks = () =>
+            scheduleBackgroundTasks([
+                () => startAutoCourseFlow(),
+                () => runNewsOrchestrator(),
+            ]);
+
+        let cancelCurrent = triggerTasks();
+
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible') {
+                cancelCurrent?.();
+                cancelCurrent = triggerTasks();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibility);
+        return () => {
+            cancelCurrent?.();
+            document.removeEventListener('visibilitychange', handleVisibility);
+        };
     }, []);
 
     return (

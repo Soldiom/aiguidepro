@@ -9,19 +9,88 @@ interface Message {
   timestamp: Date;
 }
 
+type StoredMessage = Omit<Message, 'timestamp'> & { timestamp: string };
+type StatusBanner = { type: 'info' | 'error'; message: string } | null;
+
+const STORAGE_KEY = 'aiguidepro.nora.chatHistory';
+const MAX_HISTORY = 30;
+
+const createWelcomeMessage = (): Message => ({
+  id: 'welcome',
+  text: 'مرحباً! أنا نورا، مرشدتك في عالم الذكاء الاصطناعي 🤖✨\n\nسأكون معك في كل خطوة من رحلة تعلمك. كيف يمكنني مساعدتك اليوم؟',
+  sender: 'nora',
+  timestamp: new Date(),
+});
+
+const reviveMessages = (payload: unknown): Message[] => {
+  if (!Array.isArray(payload)) return [];
+  return payload
+    .map((msg) => {
+      if (!msg || typeof msg !== 'object') return null;
+      const stored = msg as StoredMessage;
+      return {
+        ...stored,
+        timestamp: stored.timestamp ? new Date(stored.timestamp) : new Date(),
+      };
+    })
+    .filter((msg): msg is Message => !!msg && !Number.isNaN(msg.timestamp.getTime()));
+};
+
+const loadInitialMessages = () => {
+  if (typeof window === 'undefined') return [createWelcomeMessage()];
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [createWelcomeMessage()];
+    const parsed = JSON.parse(raw);
+    const revived = reviveMessages(parsed);
+    return revived.length ? revived : [createWelcomeMessage()];
+  } catch {
+    return [createWelcomeMessage()];
+  }
+};
+
 const NoraChatBot: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'مرحباً! أنا نورا، مرشدتك في عالم الذكاء الاصطناعي 🤖✨\n\nسأكون معك في كل خطوة من رحلة تعلمك. كيف يمكنني مساعدتك اليوم؟',
-      sender: 'nora',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>(loadInitialMessages);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
+  const [status, setStatus] = useState<StatusBanner>(null);
+  const [retryPayload, setRetryPayload] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<Message[]>(messages);
+  messagesRef.current = messages;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleOnline = () => {
+      setIsOnline(true);
+      setStatus({ type: 'info', message: 'تم استعادة الاتصال، يمكنك المتابعة الآن.' });
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      setStatus({ type: 'error', message: 'الاتصال غير متاح حالياً. سيتم حفظ رسائلك وإرسالها لاحقاً.' });
+    };
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const payload: StoredMessage[] = messages.slice(-MAX_HISTORY).map((msg) => ({
+      ...msg,
+      timestamp: msg.timestamp.toISOString(),
+    }));
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      /* ignore */
+    }
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -31,45 +100,70 @@ const NoraChatBot: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  useEffect(() => {
+    if (!status) return;
+    const timer = setTimeout(() => setStatus(null), 8000);
+    return () => clearTimeout(timer);
+  }, [status]);
+
+  const appendMessage = (message: Message) => {
+    setMessages((prev) => {
+      const next = [...prev, message];
+      return next.length > MAX_HISTORY ? next.slice(next.length - MAX_HISTORY) : next;
+    });
+  };
+
+  const handleSend = async (overrideText?: string) => {
+    const preparedText = (overrideText ?? input).trim();
+    if (!preparedText || isLoading) return;
+    if (!isOnline) {
+      setStatus({ type: 'error', message: 'لا يوجد اتصال بالإنترنت. أعد المحاولة بعد استعادة الاتصال.' });
+      setRetryPayload(preparedText);
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: input,
+      text: preparedText,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    appendMessage(userMessage);
+    if (!overrideText) {
+      setInput('');
+    }
     setIsLoading(true);
+    setStatus(null);
+    setRetryPayload(null);
 
     try {
-      // Build conversation history for context
-      const conversationHistory = messages.map(msg => ({
+      const conversationHistory = [...messagesRef.current, userMessage].map((msg) => ({
         role: msg.sender === 'user' ? 'user' : 'assistant',
-        content: msg.text
+        content: msg.text,
       }));
 
-      const response = await chatWithNora(input, conversationHistory);
-      
+      const response = await chatWithNora(preparedText, conversationHistory);
+
       const noraMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: response,
         sender: 'nora',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-
-      setMessages(prev => [...prev, noraMessage]);
+      appendMessage(noraMessage);
     } catch (error) {
+      const friendlyError =
+        error instanceof Error ? error.message : 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.';
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.',
+        text: `⚠️ ${friendlyError}`,
         sender: 'nora',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      appendMessage(errorMessage);
+      setStatus({ type: 'error', message: friendlyError });
+      setRetryPayload(preparedText);
     } finally {
       setIsLoading(false);
     }
@@ -83,10 +177,10 @@ const NoraChatBot: React.FC = () => {
   };
 
   const quickQuestions = [
-    "ما هو الذكاء الاصطناعي؟",
-    "كيف أبدأ تعلم AI؟",
-    "ما الفرق بين AI و ML؟",
-    "أريد دورة للمبتدئين"
+    'ما هو الذكاء الاصطناعي؟',
+    'كيف أبدأ تعلم AI؟',
+    'ما الفرق بين AI و ML؟',
+    'أريد دورة للمبتدئين',
   ];
 
   if (!isOpen) {
@@ -131,6 +225,12 @@ const NoraChatBot: React.FC = () => {
         </button>
       </div>
 
+      {!isOnline && (
+        <div className="bg-amber-500/10 text-amber-100 px-4 py-2 text-xs border-b border-amber-500/30">
+          الإرسال متوقف مؤقتاً لعدم توفر الاتصال. سنعاود المحاولة تلقائياً فور عودة الشبكة.
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/50">
         {messages.map((message) => (
@@ -152,7 +252,7 @@ const NoraChatBot: React.FC = () => {
             </div>
           </div>
         ))}
-        
+
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-slate-800 rounded-2xl px-4 py-3">
@@ -164,9 +264,31 @@ const NoraChatBot: React.FC = () => {
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
+
+      {status && (
+        <div
+          className={`mx-4 mt-3 rounded-xl px-4 py-2 text-xs border ${
+            status.type === 'error'
+              ? 'bg-rose-500/10 border-rose-500/30 text-rose-100'
+              : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-100'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span>{status.message}</span>
+            {retryPayload && status.type === 'error' && (
+              <button
+                onClick={() => handleSend(retryPayload)}
+                className="text-emerald-300 underline decoration-dotted text-[11px] hover:text-emerald-200"
+              >
+                إعادة المحاولة
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Quick Questions */}
       {messages.length === 1 && (
@@ -192,14 +314,20 @@ const NoraChatBot: React.FC = () => {
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              if (status?.type === 'error') {
+                setStatus(null);
+                setRetryPayload(null);
+              }
+            }}
             onKeyPress={handleKeyPress}
             placeholder="اكتب سؤالك هنا..."
             className="flex-1 bg-slate-800 text-white px-4 py-3 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
             disabled={isLoading}
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!input.trim() || isLoading}
             className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
