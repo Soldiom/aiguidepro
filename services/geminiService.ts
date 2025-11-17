@@ -1,88 +1,15 @@
-/**
- * Gemini API Service
- * Handles interactions with Google Gemini API for Nora AI chatbot
- */
+import { getGeminiClient } from './geminiClient';
 
-const GEMINI_API_KEY = 'AIzaSyBGcYr1Sqx1idMj_ouAjKpcdZU0UWCtUzs';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+type ConversationTurn = { role: 'user' | 'assistant'; content: string };
+type GeminiMessage = {
+  role: 'user' | 'model';
+  parts: Array<{ text: string }>;
+};
 
-interface GeminiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{
-        text: string;
-      }>;
-    };
-  }>;
-}
+const CHAT_MODEL = ((import.meta as any).env?.VITE_GEMINI_CHAT_MODEL as string) || 'gemini-2.0-flash-exp';
+const REQUEST_TIMEOUT_MS = 25_000;
 
-/**
- * Generate content using Gemini API
- */
-async function generateContent(prompt: string): Promise<string> {
-  try {
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.9,
-          topP: 0.95,
-          topK: 40,
-          maxOutputTokens: 2048,
-        },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_NONE"
-          },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_NONE"
-          },
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_NONE"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_NONE"
-          }
-        ]
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Gemini API error:', errorData);
-      throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
-    }
-
-    const data: GeminiResponse = await response.json();
-    
-    if (!data.candidates || data.candidates.length === 0) {
-      throw new Error('No response from Gemini API');
-    }
-
-    return data.candidates[0].content.parts[0].text;
-  } catch (error) {
-    console.error('Gemini API error:', error);
-    throw error;
-  }
-}
-
-/**
- * Chat with Nora AI - Super intelligent and real conversation
- */
-export async function chatWithNora(userMessage: string, conversationHistory: Array<{role: string, content: string}> = []): Promise<string> {
-  const systemPrompt = `أنت نورا AI، خبيرة ذكاء اصطناعي استثنائية ومعلمة شغوفة في منصة AI Guide Pro.
+const NORA_SYSTEM_PROMPT = `أنت نورا AI، خبيرة ذكاء اصطناعي استثنائية ومعلمة شغوفة في منصة AI Guide Pro.
 
 🌟 **شخصيتك الفريدة:**
 - **عالمة وباحثة**: لديك معرفة عميقة بالذكاء الاصطناعي، التعلم الآلي، والتعلم العميق
@@ -136,26 +63,141 @@ export async function chatWithNora(userMessage: string, conversationHistory: Arr
 
 الآن، تفاعلي مع المستخدم بذكاء وحيوية! 🚀`;
 
-  // Build conversation context
-  let fullPrompt = systemPrompt + '\n\n';
-  
-  // Add conversation history if available
-  if (conversationHistory.length > 0) {
-    fullPrompt += '**سياق المحادثة السابقة:**\n';
-    conversationHistory.slice(-6).forEach(msg => {
-      fullPrompt += `${msg.role === 'user' ? 'المستخدم' : 'نورا'}: ${msg.content}\n`;
-    });
-    fullPrompt += '\n';
-  }
-  
-  fullPrompt += `**سؤال المستخدم الحالي:**\n${userMessage}\n\n**إجابتك (نورا):`;
+const NORA_GENERATION_CONFIG = {
+  temperature: 0.9,
+  topP: 0.95,
+  topK: 40,
+  maxOutputTokens: 2048,
+};
 
-  return await generateContent(fullPrompt);
+const UTILITY_GENERATION_CONFIG = {
+  temperature: 0.6,
+  topP: 0.9,
+  topK: 32,
+  maxOutputTokens: 2048,
+};
+
+const RELAXED_SAFETY = [
+  {
+    category: 'HARM_CATEGORY_HARASSMENT',
+    threshold: 'BLOCK_NONE',
+  },
+  {
+    category: 'HARM_CATEGORY_HATE_SPEECH',
+    threshold: 'BLOCK_NONE',
+  },
+  {
+    category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+    threshold: 'BLOCK_NONE',
+  },
+  {
+    category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+    threshold: 'BLOCK_NONE',
+  },
+];
+
+const modelCache = new Map<string, any>();
+
+function getModel(cacheKey: string, options: Record<string, any>) {
+  if (!modelCache.has(cacheKey)) {
+    const client = getGeminiClient();
+    modelCache.set(cacheKey, client.getGenerativeModel(options));
+  }
+  return modelCache.get(cacheKey);
 }
 
-/**
- * Summarize a chapter
- */
+function getNoraModel() {
+  return getModel('nora', {
+    model: CHAT_MODEL,
+    systemInstruction: NORA_SYSTEM_PROMPT,
+    generationConfig: NORA_GENERATION_CONFIG,
+    safetySettings: RELAXED_SAFETY,
+  });
+}
+
+function buildUtilityModel(overrides?: { generationConfig?: Partial<typeof UTILITY_GENERATION_CONFIG> }) {
+  const generationConfig = { ...UTILITY_GENERATION_CONFIG, ...(overrides?.generationConfig || {}) };
+  return getGeminiClient().getGenerativeModel({
+    model: CHAT_MODEL,
+    generationConfig,
+    safetySettings: RELAXED_SAFETY,
+  });
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs = REQUEST_TIMEOUT_MS): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error('انتهت مهلة الاتصال بخدمة Gemini. حاول مرة أخرى بعد لحظات.'));
+    }, timeoutMs);
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+  });
+}
+
+function mapConversation(history: ConversationTurn[]): GeminiMessage[] {
+  return history
+    .slice(-8)
+    .map((turn) => ({
+      role: turn.role === 'user' ? 'user' : 'model',
+      parts: [{ text: turn.content }],
+    }))
+    .filter((turn) => !!turn.parts[0].text?.trim());
+}
+
+function extractText(result: any): string {
+  const text = result?.response?.text()?.trim();
+  if (!text) {
+    throw new Error('لم نستلم أي رد من خدمة Gemini.');
+  }
+  return text;
+}
+
+function formatGeminiError(error: unknown): Error {
+  if (error instanceof Error) {
+    if (/VITE_GEMINI_API_KEY/i.test(error.message)) {
+      return new Error('يرجى إعداد مفتاح Gemini في ملف ‎.env.local ثم إعادة تحميل الصفحة.');
+    }
+    if (/permission/i.test(error.message) || /403/.test(error.message)) {
+      return new Error('تم رفض الاتصال بخدمة Gemini. تأكد من صلاحيات المفتاح ثم حاول مجدداً.');
+    }
+    return error;
+  }
+  return new Error('تعذّر الاتصال بخدمة Gemini.');
+}
+
+export async function chatWithNora(userMessage: string, conversationHistory: ConversationTurn[] = []): Promise<string> {
+  const content = userMessage?.trim();
+  if (!content) {
+    throw new Error('يرجى كتابة رسالة قبل الإرسال.');
+  }
+
+  try {
+    const history = mapConversation(conversationHistory);
+    const messages: GeminiMessage[] = [...history, { role: 'user', parts: [{ text: content }] }];
+    const result = await withTimeout(getNoraModel().generateContent({ contents: messages }));
+    return extractText(result);
+  } catch (error) {
+    throw formatGeminiError(error);
+  }
+}
+
+async function runUtilityPrompt(prompt: string, generationOverrides?: Partial<typeof UTILITY_GENERATION_CONFIG>) {
+  try {
+    const model = buildUtilityModel({ generationConfig: generationOverrides });
+    const result = await withTimeout(model.generateContent([{ text: prompt }]));
+    return extractText(result);
+  } catch (error) {
+    throw formatGeminiError(error);
+  }
+}
+
 export async function summarizeChapter(chapterTitle: string, chapterContent: string): Promise<string> {
   const prompt = `أنت خبير في تلخيص المحتوى التعليمي. 
 
@@ -175,12 +217,9 @@ ${chapterContent}
 
 الملخص:`;
 
-  return await generateContent(prompt);
+  return runUtilityPrompt(prompt, { temperature: 0.4, maxOutputTokens: 1024 });
 }
 
-/**
- * Simplify content
- */
 export async function simplifyContent(chapterTitle: string, chapterContent: string): Promise<string> {
   const prompt = `أنت خبير في تبسيط المحتوى التعليمي للمبتدئين.
 
@@ -201,15 +240,12 @@ ${chapterContent}
 
 المحتوى المبسط:`;
 
-  return await generateContent(prompt);
+  return runUtilityPrompt(prompt, { temperature: 0.7, maxOutputTokens: 1200 });
 }
 
-/**
- * Test API connection
- */
 export async function testGeminiAPI(): Promise<boolean> {
   try {
-    await generateContent('مرحباً، هل تعمل؟');
+    await runUtilityPrompt('اختبار بسيط: هل تعمل خدمة Gemini؟', { temperature: 0.2, maxOutputTokens: 64 });
     return true;
   } catch (error) {
     console.error('Gemini API test failed:', error);
