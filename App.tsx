@@ -15,6 +15,7 @@ import AgenticAISection from './components/AgenticAISection';
 import AIFeaturesPage from './components/AIFeaturesPage';
 import CoursesPage from './components/CoursesPage';
 import NoraChatBot from './components/NoraChatBot';
+import MobileMenu from './components/MobileMenu';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminCourseGenerator from './components/AdminCourseGenerator';
 import CourseSuggestionsVoting from './components/CourseSuggestionsVoting';
@@ -69,11 +70,8 @@ const App: React.FC = () => {
             {isMenuOpen && (
                 <div className="md:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setIsMenuOpen(false)}></div>
             )}
-            
-            {/* Mobile Sidebar */}
-            <div className={`md:hidden fixed top-0 right-0 h-full w-64 bg-slate-800 z-50 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-              <SideMenu />
-            </div>
+
+            <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} isAdmin={canAdmin} />
             
             {/* Main Content */}
             <div className="flex-1 flex flex-col md:mr-64 lg:mr-72">
