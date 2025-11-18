@@ -6,6 +6,7 @@ import type { Course } from '../types/course';
 // Types moved to types/course.ts
 
 import { openExternal } from '../utils/openExternal';
+import { SectionContainer } from './ui';
 
 const CourseCard: React.FC<{ course: Course; onClick: () => void; onToast?: (msg: string) => void }> = ({ course, onClick, onToast }) => {
   const handleQuickHelp = (e: React.MouseEvent) => {
@@ -229,15 +230,15 @@ const CoursesSection: React.FC = () => {
   }, []);
 
   return (
-    <section id="courses" className="py-20 md:py-32 px-4 bg-slate-900">
-      <div className="container mx-auto max-w-6xl">
+    <>
+      <SectionContainer id="courses" className="bg-slate-900" contentClassName="max-w-6xl">
         <SectionTitle>دورات تدريبية متخصصة</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {allCourses.map((course) => (
             <CourseCard key={course.id} course={course} onClick={() => setSelectedCourse(course)} onToast={showToast} />
           ))}
         </div>
-      </div>
+      </SectionContainer>
       {/* tiny toast */}
       {toastMsg && (
         <div className="fixed bottom-4 right-4 bg-slate-800 border border-slate-700 text-slate-200 text-sm px-3 py-2 rounded shadow-lg z-50">
@@ -247,7 +248,7 @@ const CoursesSection: React.FC = () => {
       {selectedCourse && (
         <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
       )}
-    </section>
+    </>
   );
 };
 
