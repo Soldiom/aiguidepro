@@ -226,7 +226,7 @@ const AgenticAISection: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col items-center gap-4 justify-center">
             <a
               href="https://3000-i0w99un5bzd0a7a1vp6nc-71ef756c.manus-asia.computer"
               target="_blank"
@@ -236,13 +236,9 @@ const AgenticAISection: React.FC = () => {
               <span>جرب النظام الموحد</span>
               <span>🚀</span>
             </a>
-            <a
-              href="/vote"
-              className="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 border border-slate-600"
-            >
-              <span>اقترح دورة جديدة</span>
-              <span>💡</span>
-            </a>
+            <p className="text-slate-500 text-sm mt-2 italic">
+              * ميزة اقتراح الدورات قيد التطوير وسيتم الإعلان عنها قريباً
+            </p>
           </div>
         </div>
 
