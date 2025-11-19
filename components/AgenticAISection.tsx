@@ -196,67 +196,7 @@ const AgenticAISection: React.FC = () => {
           </div>
         </div>
 
-        {/* AI Guide Pro Unified System */}
-        <div className="bg-gradient-to-br from-emerald-900/30 via-teal-900/30 to-cyan-900/30 border border-emerald-500/30 rounded-2xl p-8 text-center">
-          <div className="mb-6">
-            <span className="text-6xl">🎓</span>
-          </div>
-          <h3 className="text-3xl font-bold text-white mb-4">
-            AI Guide Pro Unified System
-          </h3>
-          <p className="text-xl text-slate-300 mb-6 max-w-2xl mx-auto">
-            نظام موحد متكامل لتشغيل وإدارة Agentic AI Agents. قوي، ذكي، ومصمم خصيصاً لاحتياجاتك.
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-slate-800/50 rounded-lg p-4">
-              <div className="text-3xl mb-2">🚀</div>
-              <h4 className="font-bold text-white mb-2">سريع وقوي</h4>
-              <p className="text-sm text-slate-400">معالجة متوازية وأداء عالي</p>
-            </div>
-            <div className="bg-slate-800/50 rounded-lg p-4">
-              <div className="text-3xl mb-2">🧠</div>
-              <h4 className="font-bold text-white mb-2">ذكاء متقدم</h4>
-              <p className="text-sm text-slate-400">وكلاء أذكياء بقدرات تعلم ذاتي</p>
-            </div>
-            <div className="bg-slate-800/50 rounded-lg p-4">
-              <div className="text-3xl mb-2">🎯</div>
-              <h4 className="font-bold text-white mb-2">موحد ومتكامل</h4>
-              <p className="text-sm text-slate-400">نظام شامل لجميع احتياجاتك</p>
-            </div>
-          </div>
 
-          <div className="flex flex-col items-center gap-4 justify-center">
-            <a
-              href="https://3000-i0w99un5bzd0a7a1vp6nc-71ef756c.manus-asia.computer"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              <span>جرب النظام الموحد</span>
-              <span>🚀</span>
-            </a>
-            <p className="text-slate-500 text-sm mt-2 italic">
-              * ميزة اقتراح الدورات قيد التطوير وسيتم الإعلان عنها قريباً
-            </p>
-          </div>
-        </div>
-
-        {/* Call to Action */}
-        <div className="mt-12 text-center">
-          <p className="text-slate-400 mb-4">
-            هل أنت مستعد لتوظيف فريق AI الخاص بك؟
-          </p>
-          <a
-            href="https://3000-i0w99un5bzd0a7a1vp6nc-71ef756c.manus-asia.computer"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-10 py-5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/50 hover:scale-105 text-lg"
-          >
-            <span>ابدأ الآن مجاناً</span>
-            <span className="text-2xl">🚀</span>
-          </a>
-        </div>
       </div>
     </section>
   );
