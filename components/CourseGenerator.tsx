@@ -49,7 +49,7 @@ const CourseGenerator: React.FC = () => {
     setIsGenerating(true);
 
     try {
-      // Simulate course generation (in production, this would call Gemini API)
+      // Simulate course generation (in production, this would call AI API)
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       const course: GeneratedCourse = {
@@ -159,18 +159,31 @@ const CourseGenerator: React.FC = () => {
   const sendMessage = async () => {
     if (!userMessage.trim()) return;
 
+    const userMsg = userMessage; // Store before clearing
     const newMessages = [
       ...chatMessages,
-      { role: 'user' as const, content: userMessage }
+      { role: 'user' as const, content: userMsg }
     ];
     setChatMessages(newMessages);
     setUserMessage('');
 
-    // Simulate AI response (in production, call Gemini API)
-    setTimeout(() => {
-      const response = generateAIResponse(userMessage, generatedCourse);
-      setChatMessages([...newMessages, { role: 'assistant', content: response }]);
-    }, 1000);
+    // Generate AI response immediately
+    try {
+      // Small delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const response = generateAIResponse(userMsg, generatedCourse);
+      setChatMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: response }
+      ]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setChatMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: 'عذراً، حدث خطأ في معالجة رسالتك. الرجاء المحاولة مرة أخرى.' }
+      ]);
+    }
   };
 
   const generateAIResponse = (message: string, course: GeneratedCourse | null): string => {

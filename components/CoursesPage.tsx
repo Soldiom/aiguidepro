@@ -209,9 +209,12 @@ const CoursesPage: React.FC = () => {
                   {selectedCourse.status === 'متاح' ? (
                     <>
                       <p className="text-slate-300 mb-4">هل أنت مستعد للبدء؟</p>
-                      <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-emerald-500/50 transition-all">
+                      <a
+                        href="/ai-features?tab=course-gen"
+                        className="inline-block bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-emerald-500/50 transition-all"
+                      >
                         ابدأ الدورة الآن 🚀
-                      </button>
+                      </a>
                     </>
                   ) : (
                     <>

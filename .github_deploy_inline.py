@@ -1,0 +1,1 @@
+import os; import sys; import subprocess; os.chdir('/home/ubuntu/aiguidepro'); subprocess.run(['git', 'add', '-A']); subprocess.run(['git', 'commit', '-m', 'feat: all fixes']); subprocess.run(['git', 'push', 'origin', 'main']); print('Done')

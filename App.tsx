@@ -14,6 +14,7 @@ import NewsArabicImproved from './components/NewsArabicImproved';
 import AIFeaturesPage from './components/AIFeaturesPage';
 import CoursesPage from './components/CoursesPage';
 import NoraChatBot from './components/NoraChatBot';
+import AgenticAISection from './components/AgenticAISection';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminCourseGenerator from './components/AdminCourseGenerator';
 import CourseSuggestionsVoting from './components/CourseSuggestionsVoting';
@@ -94,6 +95,7 @@ const App: React.FC = () => {
                                     <div className="relative z-10">
                                         <IntroductionSection />
                                         <VisionMissionSection />
+                                        <AgenticAISection />
                                         <CoursesSection />
                                         <CallToActionSection />
                                     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AIChatAssistant from './AIChatAssistant';
 import AIModelPlaygroundFixed from './AIModelPlaygroundFixed';
 import GitHubCodeExamples from './GitHubCodeExamples';
@@ -7,7 +7,19 @@ import SmartLearningPath from './SmartLearningPath';
 import CourseGenerator from './CourseGenerator';
 
 const AIFeaturesPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('chat');
+  // Check URL for tab parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTab = urlParams.get('tab') || 'chat';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Update tab from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab && ['chat', 'playground', 'code', 'examples', 'learning', 'course-gen'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, []);
 
   const tabs = [
     { id: 'chat', name: 'مساعد AI', icon: '🤖', component: AIChatAssistant },
@@ -62,7 +74,6 @@ const AIFeaturesPage: React.FC = () => {
           <p className="text-slate-300">
             جميع هذه الميزات تعمل مباشرة في متصفحك باستخدام أحدث تقنيات الذكاء الاصطناعي من 
             <strong className="text-emerald-400"> Hugging Face</strong> و
-            <strong className="text-blue-400"> Google Gemini</strong> و
             <strong className="text-purple-400"> GitHub</strong>.
             لا حاجة لتثبيت أي برامج!
           </p>

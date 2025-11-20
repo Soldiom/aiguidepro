@@ -80,7 +80,7 @@ const AdminCourseGenerator: React.FC = () => {
     <section className="py-20 md:py-32 px-4 bg-slate-900">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl md:text-4xl font-black text-white mb-6 text-center">لوحة إدارة الدورات (عاملة محلياً)</h1>
-        <p className="text-slate-400 mb-8 text-center">اكتب المواضيع بالعربية وحدد عدد الدورات لكل موضوع. سيقوم Gemini بإنشاء دورات عربية مبسطة ومتصلة بـ AIGuidePro كمستشار.</p>
+        <p className="text-slate-400 mb-8 text-center">اكتب المواضيع بالعربية وحدد عدد الدورات لكل موضوع. سيتم إنشاء دورات عربية مبسطة ومتصلة بـ AIGuidePro كمستشار تلقائياً.</p>
 
         <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-6">
           <div>

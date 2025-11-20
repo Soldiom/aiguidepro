@@ -62,7 +62,7 @@ const CourseSuggestionsVoting: React.FC = () => {
     <section className="py-16 px-4 bg-slate-900">
       <div className="mx-auto max-w-5xl">
         <h2 className="text-3xl md:text-4xl font-black text-white mb-6 text-center">اقتراحات الدورات والتصويت</h2>
-        <p className="text-slate-400 text-center mb-8">اقترح Gemini أفكار دورات عربية. صوِّت للفكرة الأفضل. عند بلوغ الحد سيتم إنشاء دورة مجانية ونشرها.</p>
+        <p className="text-slate-400 text-center mb-8">إليك أفكار دورات عربية مقترحة. صوِّت للفكرة الأفضل. عند بلوغ الحد سيتم إنشاء دورة مجانية ونشرها.</p>
 
         <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 mb-8">
           <div className="flex flex-col md:flex-row gap-4 md:items-end">

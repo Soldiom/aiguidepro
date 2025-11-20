@@ -80,7 +80,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ className }) => {
                             className={({ isActive }) => `flex items-center px-4 py-3 text-lg rounded-lg transition-colors duration-200 ${isActive ? 'bg-emerald-500/10 text-emerald-300 font-bold' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}
                         >
                             <ToolsIcon />
-                            الأدوات
+                            المستشارين الافتراضيين
                         </NavLink>
                     </li>
                     <li>

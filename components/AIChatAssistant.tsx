@@ -145,7 +145,7 @@ const AIChatAssistant: React.FC = () => {
           </button>
         </div>
         <p className="text-xs text-slate-500 mt-2 text-center">
-          مدعوم بتقنية Gemini AI
+          مدعوم بتقنيات الذكاء الاصطناعي المتقدمة
         </p>
       </div>
     </div>
