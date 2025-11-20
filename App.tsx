@@ -11,10 +11,11 @@ import CallToActionSection from './components/CallToActionSection';
 import VisionMissionSection from './components/VisionMissionSection';
 import CommunityVoting from './components/CommunityVoting';
 import NewsArabicImproved from './components/NewsArabicImproved';
+import AgenticAISection from './components/AgenticAISection';
 import AIFeaturesPage from './components/AIFeaturesPage';
 import CoursesPage from './components/CoursesPage';
 import NoraChatBot from './components/NoraChatBot';
-import AgenticAISection from './components/AgenticAISection';
+import AIMapPage from './components/AIMapPage';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminCourseGenerator from './components/AdminCourseGenerator';
 import CourseSuggestionsVoting from './components/CourseSuggestionsVoting';
@@ -154,6 +155,10 @@ const App: React.FC = () => {
                         <Route
                             path="/courses"
                             element={<CoursesPage />}
+                        />
+                        <Route
+                            path="/ai-map"
+                            element={<AIMapPage />}
                         />
         <Route path="/about" element={
                             <div className="relative z-10 py-20 px-4 max-w-4xl mx-auto">

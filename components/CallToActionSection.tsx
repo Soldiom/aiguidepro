@@ -27,6 +27,9 @@ const CallToActionSection: React.FC = () => {
               احصل على 500 رصيد مجاني في Manus
             </button>
           </div>
+          <p className="text-slate-500 text-sm mt-6 italic">
+            * ميزة اقتراح الدورات قيد التطوير وسيتم الإعلان عنها قريباً
+          </p>
         </div>
 
       </div>
