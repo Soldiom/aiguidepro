@@ -100,7 +100,7 @@ const sampleCountryData: Record<string, AiLevel> = {
 const Legend: React.FC = () => (
   <div className="absolute bottom-4 right-4 bg-slate-800/90 backdrop-blur-sm border border-slate-700 rounded-lg p-4 text-xs text-slate-300 space-y-2 w-56 shadow-xl">
     <h4 className="font-bold text-white text-sm text-right mb-3">
-      المستوى المعلوماتي الاستخباراتي
+      المستوى المعلوماتي
     </h4>
     {Object.entries(levelConfig)
       .filter(([level]) => level !== 'Not Available')
@@ -118,7 +118,7 @@ const Instructions: React.FC = () => (
   <div className="absolute top-4 left-4 bg-slate-800/90 backdrop-blur-sm border border-slate-700 rounded-lg p-4 text-sm text-slate-200 shadow-xl">
     <p className="flex items-center gap-2">
       <span className="text-xl">💡</span>
-      <span>انقر على أي دولة لعرض التقرير الاستخباراتي المعلوماتي</span>
+      <span>انقر على أي دولة لعرض التقرير المعلوماتي</span>
     </p>
   </div>
 );
@@ -127,7 +127,7 @@ const UpdateNotice: React.FC = () => (
   <div className="absolute top-4 right-4 bg-slate-800/90 backdrop-blur-sm border border-slate-700 rounded-lg p-4 text-sm text-slate-200 shadow-xl max-w-md">
     <p className="flex items-start gap-2">
       <span className="text-xl">ℹ️</span>
-      <span>يتم تحديث البيانات المعلوماتية الاستخباراتية تلقائياً بواسطة Gemini أسبوعياً</span>
+      <span>يتم تحديث البيانات المعلوماتية تلقائياً بواسطة Gemini أسبوعياً</span>
     </p>
   </div>
 );
@@ -157,7 +157,7 @@ const CountryInfoPanel: React.FC<{ countryName: string; level: AiLevel; onClose:
 
         <div className="space-y-4">
           <div className="bg-slate-900/50 rounded-lg p-4">
-            <h4 className="text-sm text-slate-400 mb-2">المستوى المعلوماتي الاستخباراتي</h4>
+            <h4 className="text-sm text-slate-400 mb-2">المستوى المعلوماتي</h4>
             <div className="flex items-center gap-3">
               <div className={`w-6 h-6 rounded-full ${levelInfo.color}`}></div>
               <span className="text-xl font-bold text-white">{levelInfo.label}</span>
@@ -167,7 +167,7 @@ const CountryInfoPanel: React.FC<{ countryName: string; level: AiLevel; onClose:
           <div className="bg-slate-900/50 rounded-lg p-4">
             <h4 className="text-sm text-slate-400 mb-2">معلومات إضافية</h4>
             <p className="text-slate-300">
-              التقرير الاستخباراتي المعلوماتي الكامل لـ {nameAR} سيتم إضافته قريباً.
+              التقرير المعلوماتي الكامل لـ {nameAR} سيتم إضافته قريباً.
               يتم جمع البيانات وتحليلها بواسطة نظام Gemini AI.
             </p>
           </div>
@@ -213,7 +213,7 @@ export default function AIMapPage() {
             خريطة الذكاء الاصطناعي العالمية
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            تقرير معلوماتي استخباراتي شامل لمستوى تبني الذكاء الاصطناعي حول العالم
+            تقرير معلوماتي شامل لمستوى تبني الذكاء الاصطناعي حول العالم
           </p>
         </div>
 
@@ -318,7 +318,7 @@ export default function AIMapPage() {
           </div>
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
             <div className="text-3xl mb-3">🔍</div>
-            <h3 className="text-xl font-bold text-white mb-2">استخباراتي</h3>
+            <h3 className="text-xl font-bold text-white mb-2">معلوماتي</h3>
             <p className="text-slate-400">
               تحليلات عميقة واستراتيجية لفهم التوجهات العالمية في AI
             </p>
