@@ -14,7 +14,7 @@ import NewsArabicImproved from './components/NewsArabicImproved';
 import AgenticAISection from './components/AgenticAISection';
 import AIFeaturesPage from './components/AIFeaturesPage';
 import CoursesPage from './components/CoursesPage';
-import NoraChatBot from './components/NoraChatBot';
+import AliChatBot from './components/AliChatBot';
 import AIMapPage from './components/AIMapPage';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminCourseGenerator from './components/AdminCourseGenerator';
@@ -30,7 +30,7 @@ const MenuIcon = () => (
 );
 
 const CloseIcon = () => (
-     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
 );
@@ -50,7 +50,7 @@ const App: React.FC = () => {
             if (params.get('admin') === '1') {
                 setAdmin(true);
             }
-        } catch {}
+        } catch { }
         setCanAdmin(isAdmin());
     }, [location.pathname, location.hash]);
 
@@ -63,19 +63,19 @@ const App: React.FC = () => {
         <div className="min-h-screen bg-slate-900 flex">
             {/* Sidebar for desktop */}
             <div className="hidden md:block md:w-64 lg:w-72 flex-shrink-0">
-                 <SideMenu className="fixed top-0 right-0 h-full w-64 lg:w-72" />
+                <SideMenu className="fixed top-0 right-0 h-full w-64 lg:w-72" />
             </div>
 
             {/* Mobile menu overlay */}
             {isMenuOpen && (
                 <div className="md:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setIsMenuOpen(false)}></div>
             )}
-            
+
             {/* Mobile Sidebar */}
             <div className={`md:hidden fixed top-0 right-0 h-full w-64 bg-slate-800 z-50 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-              <SideMenu />
+                <SideMenu />
             </div>
-            
+
             {/* Main Content */}
             <div className="flex-1 flex flex-col md:mr-64 lg:mr-72">
                 {/* Mobile Header */}
@@ -160,7 +160,7 @@ const App: React.FC = () => {
                             path="/ai-map"
                             element={<AIMapPage />}
                         />
-        <Route path="/about" element={
+                        <Route path="/about" element={
                             <div className="relative z-10 py-20 px-4 max-w-4xl mx-auto">
                                 <h1 className="text-4xl font-bold text-white mb-6">عن المنصة</h1>
                                 <div className="bg-slate-800 rounded-lg p-8 text-slate-300 space-y-4">
@@ -174,9 +174,9 @@ const App: React.FC = () => {
                     <Footer />
                 </main>
             </div>
-            
+
             {/* Nora AI ChatBot - Available on all pages */}
-            <NoraChatBot />
+            <AliChatBot />
         </div>
     );
 };
