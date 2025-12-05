@@ -17,6 +17,6 @@ export default defineConfig({
   ],
   // Set the base path for assets. Using './' for relative paths ensures the app
   // works correctly whether it's deployed at the root of a domain or in a subdirectory.
-  base: './',
+  base: '/aiguidepro/',
   publicDir: 'public'
 });
